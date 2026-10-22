@@ -1,0 +1,17 @@
+Kraftplan als App installieren (Android)
+
+1. Auf github.com anmelden. Oben rechts auf "+" > "New repository".
+   Name: kraftplan   Sichtbarkeit: Public   > "Create repository".
+2. Im neuen Repository auf "uploading an existing file" klicken.
+   Alle Dateien aus diesem ZIP hineinziehen (nicht den Ordner, die Dateien),
+   unten auf "Commit changes".
+3. Settings > Pages (linke Spalte). Bei "Branch": main und / (root) wählen > Save.
+4. 1-2 Minuten warten. Die Adresse lautet:
+   https://DEIN-GITHUB-NAME.github.io/kraftplan/
+5. Diese Adresse am Handy in Chrome öffnen.
+   Menü (drei Punkte) > "App installieren" bzw. "Zum Startbildschirm hinzufügen" > Installieren.
+
+Update: Neue index.html im Repository hochladen (gleiche Datei ersetzen).
+Die App lädt die neue Version beim übernächsten Start.
+Hinweis: Das Repository ist öffentlich, es enthält aber keine persönlichen Daten.
+Der Trainingsverlauf bleibt nur auf dem Handy.
