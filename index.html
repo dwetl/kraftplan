@@ -58,7 +58,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 .opts{display:flex;gap:16px;flex-wrap:wrap}
 .opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
 .opts input{width:20px;height:20px;accent-color:var(--work)}
-.start{font-family:var(--f-display);font-weight:700;font-size:1.5rem;letter-spacing:.03em;border:0;border-radius:14px;padding:16px;background:var(--work);color:var(--on-accent);cursor:pointer}
+.start{font-family:var(--f-display);font-weight:700;font-size:1.35rem;letter-spacing:.03em;border:0;border-radius:14px;padding:16px;background:var(--work);color:var(--on-accent);cursor:pointer}
 .start[disabled]{background:var(--line);color:var(--muted);cursor:not-allowed}
 .week{display:flex;align-items:center;gap:10px}
 .dots{display:flex;gap:6px}
@@ -109,12 +109,22 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 .stp button{font:inherit;font-weight:700;font-size:1.2rem;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 .stp button[disabled]{opacity:.35;cursor:default}
 .stp span{font-family:var(--f-display);font-size:1.2rem;font-weight:600;min-width:4.2em;text-align:center;font-variant-numeric:tabular-nums}
-.sec{font-family:var(--f-display);font-weight:600;font-size:1.2rem;letter-spacing:.02em;border:1.5px solid var(--work);color:var(--work);background:transparent;border-radius:12px;padding:12px;cursor:pointer}
+.sec{font-family:var(--f-display);font-weight:600;font-size:1.1rem;letter-spacing:.02em;border:1.5px solid var(--work);color:var(--work);background:transparent;border-radius:12px;padding:12px;cursor:pointer}
 .tin{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
 .tin output{font-family:var(--f-display);font-weight:600;font-size:clamp(3.2rem,16vw,5.2rem);line-height:1;font-variant-numeric:tabular-nums}
 .tin .u{color:var(--muted);font-size:.9rem}
 .tin .row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
 .tin button{font-family:var(--f-display);font-weight:600;font-size:1.15rem;padding:10px 0;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.rlog{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.rlog .l{flex:1 1 140px;min-width:0;font-size:.92rem}
+.rlog .l b{display:block}
+.rlog .stp output{font-family:var(--f-display);font-size:1.5rem;font-weight:600;min-width:2.2ch;text-align:center;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:inherit;font-weight:600;min-width:40px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed="true"]{border-color:var(--work);background:var(--work);color:var(--on-accent)}
+.goal li{align-items:center}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.btnrow .sec{flex:1 1 150px}
 .done{text-align:center;align-items:center;justify-content:center}
 .done .big{font-family:var(--f-display);font-weight:700;font-size:3rem;color:var(--ok);margin:0}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
@@ -136,7 +146,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   <section class="card">
     <h2>Training</h2>
     <div class="seg" id="segT">
-      <button type="button" id="tA" data-v="A"><b>Training A</b><small>Beine · Drücken · Rumpf</small></button>
+      <button type="button" id="tA" data-v="A"><b>Training A</b><small>Beine · Drücken · Ziehen · Rumpf</small></button>
       <button type="button" id="tB" data-v="B"><b>Training B</b><small>Ausfallschritt · Drücken · Rücken · Rumpf</small></button>
     </div>
     <div class="pv"><canvas id="pvc" aria-label="Vorschau der Übung"></canvas><span class="cap" id="pvcap">Übung antippen für die Vorschau</span></div>
@@ -146,6 +156,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   <section class="card">
     <h2>Deine Stufen</h2>
     <div id="lvrows"></div>
+    <p id="rpeHint" hidden><span class="pill warn">Die letzten zwei Trainings waren leicht (Anstrengung 5 oder weniger). Erhöhe eine Stufe.</span></p>
     <p class="note">Takt: <span id="timing"></span>. Der Monatstest stellt die Stufen ein, du kannst sie jederzeit selbst ändern.</p>
   </section>
 
@@ -160,11 +171,26 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   <button class="start" id="go" type="button">Start · ca. 20 Min</button>
 
   <section class="card">
+    <h2>Blutdruck-Block</h2>
+    <p class="note">Wandsitzen in 4 Sätzen mit je 2 Minuten Pause. Isometrisches Training senkte den Blutdruck in Studien am stärksten. Ziel: 3× pro Woche, auch an Tagen ohne Krafttraining. Vorher mit dem Hausarzt abstimmen.</p>
+    <div><span class="note">Haltezeit pro Satz:</span></div>
+    <div class="chips" id="isoD"><button type="button" data-v="60">1:00</button><button type="button" data-v="90">1:30</button><button type="button" data-v="120">2:00</button></div>
+    <p class="note">Mit 1:00 beginnen, nach ein bis zwei Wochen steigern. Kniewinkel so wählen, dass die letzten 20 Sekunden anstrengend, aber gut machbar sind (etwa 7 von 10). Durchatmen, nie pressen.</p>
+    <div id="isoStat"></div>
+    <button class="sec" id="goiso" type="button">Blutdruck-Block starten</button>
+  </section>
+
+  <section class="card">
     <h2>Monatstest</h2>
     <p class="note">Einmal im Monat: maximale Liegestütze, Wandsitzen und Unterarmstütz. Danach passt die App deine Stufen an. Am besten ausgeruht testen, nicht am Tag nach einem Training.</p>
     <div id="tstat"></div>
     <ul class="list hist" id="tlist" hidden></ul>
     <button class="sec" id="gotest" type="button">Monatstest starten · ca. 16 Min</button>
+  </section>
+
+  <section class="card">
+    <h2>12-Wochen-Ziele</h2>
+    <div id="goals"></div>
   </section>
 
   <section class="card">
@@ -174,12 +200,21 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
       <li>Am Ende jeder Übung noch 2–3 Wiederholungen im Tank.</li>
       <li>Vom Boden langsam über den Vierfüßlerstand aufstehen.</li>
       <li>Abbrechen bei Brustschmerz, Schwindel, Atemnot, Herzstolpern, Ausstrahlen ins Bein oder Knieschwellung.</li>
+      <li>Alltag: 7.000–8.000 Schritte pro Tag. Stell das als Tagesziel in Garmin Connect ein.</li>
     </ul>
   </section>
 
   <section class="card" id="histcard" hidden>
     <h2>Letzte Einheiten</h2>
     <ul class="list hist" id="hist"></ul>
+  </section>
+
+  <section class="card">
+    <h2>Daten sichern</h2>
+    <p class="note">Alle Einheiten, Wiederholungen und Tests als Tabelle (CSV), z. B. für den Arzttermin. Die Daten liegen sonst nur auf diesem Gerät.</p>
+    <div class="btnrow"><button class="sec" id="expCopy" type="button">Kopieren</button><button class="sec" id="expSave" type="button">Als Datei speichern</button></div>
+    <p class="note" id="expMsg" aria-live="polite"></p>
+    <textarea id="expTxt" rows="4" readonly hidden style="width:100%;font:12px/1.3 ui-monospace,monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px"></textarea>
   </section>
 </div>
 
@@ -211,6 +246,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
       </div>
     </div>
     <ul class="cues" id="cues"></ul>
+    <div class="rlog" id="rlog" hidden><div class="l"><span class="note">Wiederholungen eben (vorbelegt mit letztem Mal) bei</span><b id="rlN">–</b></div><div class="stp"><button type="button" data-d="-1" aria-label="weniger">−</button><output id="rlV">0</output><button type="button" data-d="1" aria-label="mehr">+</button></div></div>
     <div class="nxt" id="nxt"></div>
     <div class="ctl">
       <button type="button" id="back">‹ Zurück</button>
@@ -225,6 +261,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   <p class="big">Geschafft</p>
   <p id="finTxt" class="sub"></p>
   <ul class="list hist" id="finDet" style="width:100%;text-align:left" hidden></ul>
+  <section class="card" id="rpeCard" style="width:100%;text-align:left">
+    <h2>Wie anstrengend war die Einheit?</h2>
+    <div class="chips" id="rpe"></div>
+    <p class="note">1 = sehr leicht, 5 = mittel, 7 = schwer, 10 = maximal</p>
+  </section>
   <p class="note" id="finNote">Die Einheit ist in „Letzte Einheiten“ gespeichert (nur auf diesem Gerät).</p>
   <button class="start" id="home2" type="button" style="width:100%">Zurück zur Übersicht</button>
 </div>
@@ -240,14 +281,14 @@ A:[
  {n:"Beckenheben",g:"b",c:["Rückenlage, Füße aufgestellt, Arme gestreckt neben dem Körper am Boden","Becken heben, bis Knie, Hüfte und Schultern eine Linie bilden","Oben kurz halten, ausatmen"],v:["Beidbeinig","Beidbeinig, oben 2 s halten","Einbeinig, Seiten abwechseln","Einbeinig, oben 3 s halten, Seiten abwechseln"]},
  {n:"Bird-Dog",g:"r",c:["Vierfüßlerstand, Rücken ruhig","Langsam strecken, nicht ins Hohlkreuz","Seiten abwechseln"],v:["Nur Arm oder nur Bein","Arm und Bein gegengleich","Gegengleich, 2 s halten","Gegengleich, 3 s halten, dann Ellbogen zum Knie"]},
  {n:"Wandsitzen",g:"b",c:["Rücken an der Wand","Knie nicht über die Zehen","Ruhig weiteratmen, nicht pressen"],v:["Hoch stehen, ca. 120° im Knie","Etwas tiefer, schmerzfrei","Ca. 100–110° im Knie","So tief wie im Test, schmerzfrei"],hold:[30,40,45,60]},
- {n:"Liegestütz eng",g:"o",tgt:.5,c:["Hände schulterbreit oder etwas enger","Ellbogen eng am Körper nach hinten","Beim Wegdrücken ausatmen, nicht pressen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche (z. B. Sofakante)","Am Boden, Hände schulterbreit"]}
+ {n:"Rudern am Türrahmen",g:"o",c:["Beide Hände seitlich in einen stabilen Türrahmen, auf Brusthöhe","Füße nah am Rahmen, Körper gerade nach hinten lehnen","Brust zum Rahmen ziehen, Schulterblätter zusammen, dabei ausatmen","Rutschfeste Schuhe oder barfuß, nicht in Socken"],v:["Fast aufrecht, nur leicht zurückgelehnt","Weiter zurückgelehnt, Füße näher am Rahmen","Stark zurückgelehnt, vorne 2 s halten","Einarmig, Seiten abwechseln, 3 s zurück"]}
 ],
 B:[
  {n:"Kurzer Ausfallschritt",g:"b",c:["Eine Hand an der Stuhllehne","Hinteres Knie ein Stück absenken","Oberkörper aufrecht"],v:["Kleine Bewegung","Etwas tiefer, schmerzfrei","Ohne Stütze, wenn sicher","Ohne Stütze, 3 s runter, unten 1 s halten"],sides:true},
  {n:"Liegestütz",g:"o",tgt:.6,c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche (z. B. Sofakante)","Am Boden (normale Liegestütze)"]},
  {n:"Bauchlage Y-T",g:"o",c:["Bauchlage, Stirn auf ein Handtuch","Arme als Y nach vorn, dann als T zur Seite","Daumen nach oben, Arme nur wenige cm heben, Kopf bleibt unten"],v:["Kurz anheben, wieder ablegen","Oben 2 s halten","Zwischen Y und T wechseln, ohne abzulegen","Y und T je 3 s halten, ohne abzulegen"]},
  {n:"Wadenheben",g:"b",c:["Hände an der Wand","Langsam auf die Zehen","1 s halten, langsam ab"],v:["Beidbeinig","Beidbeinig, 3 s ablassen","Einbeinig, Seiten abwechseln","Einbeinig, oben 2 s halten, 3 s ablassen"]},
- {n:"Seitstütz",g:"r",c:["Unterarm unter der Schulter","Hüfte heben, Körper gerade","Weiteratmen"],v:["Auf den Knien","Auf den Knien, ruhig halten","Auf den Füßen","Auf den Füßen, Hüfte langsam senken und heben"],sides:true},
+ {n:"Seitstütz",g:"r",c:["Unterarm unter der Schulter","Hüfte heben, Körper gerade","Weiteratmen"],v:["Auf den Knien","Auf den Knien, ruhig halten","Auf den Füßen","Auf den Füßen, Hüfte langsam senken und heben"],sides:true,noReps:true},
  {n:"Dead Bug",g:"r",c:["Rückenlage, Knie und Hüfte 90° angewinkelt","Unterer Rücken bleibt am Boden","Langsam, beim Strecken ausatmen"],v:["Hände neben dem Körper am Boden, Ferse abwechselnd Richtung Boden tippen","Arme senkrecht nach oben, Arm und Bein gegengleich strecken","Wie Stufe 2, 2 s in der Streckung halten","Gegengleich, 3 s knapp über dem Boden halten"]}
 ]};
 const TESTDEF=[
@@ -311,13 +352,16 @@ const AN={
  calf_3:D({props:["wallR"],feet:true,segs:[1,2,3],hold:0,kf:[{x:100,y:71,t:8,hd:0,fa:[102,130],fb:[84,110],ha:[139,50],hb:[137,52]},{x:100,y:62,t:8,hd:0,fa:[102,122],fb:[84,101],ha:[139,44],hb:[137,46]},{x:100,y:62,t:8,hd:0,fa:[102,122],fb:[84,101],ha:[139,44],hb:[137,46]}]}),
  lunge_2:D({feet:true,segs:[1.8,1.4],kf:[{x:94,y:74,t:0,hd:0,fa:[116,130],fb:[72,130],ha:[104,73],hb:[101,74]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[104,91],hb:[101,92]}]}),
  lunge_3:D({feet:true,segs:[3,1,1.3],hold:0,kf:[{x:94,y:74,t:0,hd:0,fa:[116,130],fb:[72,130],ha:[104,73],hb:[101,74]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[104,91],hb:[101,92]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[104,91],hb:[101,92]}]}),
+ row:D({props:["frame"],feet:true,ep:[-1,.4],segs:[1.4,1.8],kf:[{x:118.5,y:71.3,t:-19,hd:0,fa:[138,129],fb:[135,129],ha:[147,46],hb:[145,48]},{x:128.6,y:68.7,t:-9,hd:0,fa:[138,129],fb:[135,129],ha:[147,46],hb:[145,48]}]}),
+ row_3:D({props:["frame"],feet:true,ep:[-1,.4],segs:[1.4,3],kf:[{x:118.5,y:71.3,t:-19,hd:0,fa:[138,129],fb:[135,129],ha:[147,46],hb:[145,48]},{x:128.6,y:68.7,t:-9,hd:0,fa:[138,129],fb:[135,129],ha:[147,46],hb:[145,48]}]}),
  breathe:D({props:["chairL"],segs:[4,6],hold:0,kf:[{x:84,y:95,t:-3,hd:0,fa:[114,130],fb:[111,130],ha:[100,82],hb:[98,84]},{x:84,y:94,t:1,hd:-4,fa:[114,130],fb:[111,130],ha:[102,80],hb:[100,82]}]})
 };
-const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz":"pushup","Liegestütz eng":"pushup","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
+const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz":"pushup","Liegestütz eng":"pushup","Rudern am Türrahmen":"row","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
 const PROPS={
  chairL:[[56,99,88,99],[58,99,58,130],[86,99,86,130],[58,99,56,62]],
  table:[[148,82,196,82],[152,82,152,130],[192,82,192,130]],
  wallL:[[62,-14,62,130]], wallP:[[152,-14,152,130]], towel:[[118,129,140,129]], wallR:[[142,-14,142,130]], door:[[80,-14,80,130],[80,-14,96,-14]],
+ frame:[[150,-14,150,130],[156,-14,156,130]],
  bench:[[146,105,196,105],[148,105,148,130],[194,105,194,130]],
  chairR:[[132,56,132,130],[132,98,162,98],[160,98,160,130]]};
 AN.side_3=AN.side_2;
@@ -405,8 +449,9 @@ let hist=store.get("kp_hist",[]);
 let TESTS=store.get("kp_tests",[]);
 let LV=store.get("kp_lv",null);
 if(!LV||!LV.o){const p=Math.min(2,Math.max(0,+store.get("kp_P",0)||0))+1;LV={o:p,b:p,r:p}}
-const lastTrain=()=>hist.find(h=>h.t&&h.type!=="test");
+const lastTrain=()=>hist.find(h=>h.t&&!h.type);
 let T=lastTrain()?(lastTrain().t==="A"?"B":"A"):(store.get("kp_T","A")||"A");
+let ISO=store.get("kp_iso",60);
 $("optVoice").checked=store.get("kp_voice",true);$("optBeep").checked=store.get("kp_beep",true);
 const AREA={o:{n:"Oberkörper",d:["Liegestütz an der Wand","Liegestütz am Tisch","Liegestütz an niedriger Fläche","Liegestütz am Boden"]},
  b:{n:"Beine",d:["Auf den Stuhl setzen","Stuhl nur antippen","Langsam, 3 s runter","Ohne Stuhl, mit Haltepausen"]},
@@ -436,19 +481,51 @@ function renderHome(){
   $("tstat").innerHTML=!t?'<span class="pill warn">Noch kein Test. Starte am besten damit.</span>':(days>=28?`<span class="pill warn">Monatstest fällig · letzter vor ${days} Tagen</span>`:`<span class="pill ok">Nächster Test in ${28-days} Tag${28-days===1?"":"en"}</span>`);
   $("tlist").hidden=!TESTS.length;
   $("tlist").innerHTML=TESTS.slice(0,6).map(x=>`<li><span>${dstr(x.d)}</span><span>${x.push??"–"} Liegest. · Wand ${x.wall!=null?fmt(x.wall):"–"} · Stütz ${x.plank!=null?fmt(x.plank):"–"}</span></li>`).join("");
-  const wk=weekKey(Date.now()),cnt=hist.filter(h=>weekKey(h.d)===wk&&!h.light).length;
+  const wk=weekKey(Date.now()),cnt=hist.filter(h=>weekKey(h.d)===wk&&!h.light&&h.type!=="iso").length,icnt=hist.filter(h=>weekKey(h.d)===wk&&h.type==="iso").length;
   [...$("dots").children].forEach((d,i)=>d.classList.toggle("on",i<cnt));
   $("weektxt").textContent=`Diese Woche: ${Math.min(cnt,2)} von 2 Einheiten`+(cnt>=2?" ✓":` · als Nächstes Training ${T}`);
-  if(hist.length){$("histcard").hidden=false;$("hist").innerHTML=hist.slice(0,8).map(h=>`<li><span>${dstr(h.d)} · ${h.type==="test"?"Monatstest":h.light?"Nur Gehen":"Training "+h.t}</span><span>${h.min?h.min+" Min":""}</span></li>`).join("")}
+  if(hist.length){$("histcard").hidden=false;$("hist").innerHTML=hist.slice(0,10).map(h=>`<li><span>${dstr(h.d)} · ${h.type==="test"?"Monatstest":h.type==="iso"?"Blutdruck-Block "+fmt(h.hold||60):"Training "+h.t}</span><span>${h.rpe?"Anstr. "+h.rpe+" · ":""}${h.min?h.min+" Min":""}</span></li>`).join("")}
+  [...$("isoD").children].forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===ISO));
+  $("isoStat").innerHTML=`<span class="pill ${icnt>=3?"ok":"warn"}">Diese Woche: ${Math.min(icnt,3)} von 3${icnt>=3?" ✓":""}</span>`;
+  $("goiso").textContent=`Blutdruck-Block starten · ${Math.round(total(buildIso())/60)} Min`;
+  const lt=hist.filter(h=>h.t&&!h.type).slice(0,2);
+  $("rpeHint").hidden=!(lt.length===2&&lt.every(h=>h.rpe&&h.rpe<=5));
+  renderGoals();
   $("go").textContent=`Training ${T} starten · ${Math.round(total(buildTrain())/60)} Min`;
 }
-let mode="train",RES={},ts=null;
+let mode="train",RES={},ts=null,REPS={},curH=null;
+function renderGoals(){
+  if(!TESTS.length){$("goals").innerHTML='<p class="note">Nach deinem ersten Monatstest erscheinen hier deine Ziele für die nächsten 12 Wochen.</p>';return}
+  const base=TESTS[TESTS.length-1],now=TESTS[0],due=new Date(base.d+84*864e5),left=Math.ceil((due-Date.now())/864e5);
+  const row=(lab,k,f)=>{if(base[k]==null)return"";const tgt=k==="push"?Math.max(base[k]+3,Math.ceil(base[k]*1.3)):Math.ceil(base[k]*1.3/5)*5,cur=now[k];const ok=cur!=null&&cur>=tgt;
+    return `<li><span>${lab}: ${f(base[k])} → Ziel <b>${f(tgt)}</b></span><span class="pill ${ok?"ok":"warn"}">${ok?"erreicht ✓":"aktuell "+(cur!=null?f(cur):"–")}</span></li>`};
+  $("goals").innerHTML=`<p class="note">Start: Test vom ${dstr(base.d)} · Ziel bis ${due.toLocaleDateString("de-AT")} (${left>0?"noch "+left+" Tage":"fällig"}). Ziel heißt: plus 30 % gegenüber dem ersten Test.</p>
+  <ul class="list hist goal">${row("Liegestütze","push",x=>x)}${row("Wandsitzen","wall",fmt)}${row("Unterarmstütz","plank",fmt)}</ul>
+  <p class="note"><b>Prüfsteine außerhalb der App:</b> Blutdruck tagsüber im Mittel unter 130/80 (Hilo-Monatsbericht) · Schritte im Median über 7.000 (Garmin) · Laborkontrolle HbA1c und LDL beim Hausarzt, etwa Anfang Jänner 2027.</p>`;
+}
+function csv(){
+  const q=v=>{v=v==null?"":String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const lines=["Datum;Art;Training;Minuten;Anstrengung;Stufe Oberkörper;Stufe Beine;Stufe Rumpf;Haltezeit s;Wiederholungen"];
+  [...hist].reverse().forEach(h=>{const d=new Date(h.d);lines.push([d.toISOString().slice(0,16).replace("T"," "),h.type==="test"?"Monatstest":h.type==="iso"?"Blutdruck-Block":"Krafttraining",h.t||"",h.min||"",h.rpe||"",h.lv?h.lv.o:"",h.lv?h.lv.b:"",h.lv?h.lv.r:"",h.hold||"",h.reps?Object.entries(h.reps).map(([k,v])=>k+": "+v.filter(x=>x!=null).join("/")).join(", "):""].map(q).join(";"))});
+  lines.push("","Datum;Liegestütze;Wandsitzen s;Unterarmstütz s");
+  [...TESTS].reverse().forEach(t=>lines.push([new Date(t.d).toISOString().slice(0,10),t.push??"",t.wall??"",t.plank??""].join(";")));
+  return lines.join("\n");
+}
+function buildIso(){
+  const st=[{k:"ready",n:"Bereit machen",d:8,c:["Blutdruck-Block: kurzes Aufwärmen, dann 4 Sätze Wandsitzen"]}];
+  [WARM[0],WARM[2],WARM[4]].forEach(w=>st.push({k:"warm",...w}));
+  for(let i=1;i<=4;i++){st.push({k:"work",n:"Wandsitzen",iso:true,hold:true,v:`${fmt(ISO)} halten · etwa 7 von 10 am Ende`,c:["Rücken an der Wand, jedes Mal gleiche Tiefe","Ruhig und gleichmäßig weiteratmen, nie pressen","Wird es zu schwer: etwas höher rutschen statt abbrechen"],d:ISO,li:0,lab:`Satz ${i}/4`});
+    if(i<4)st.push({k:"rest",n:"Pause",d:120,c:["Locker gehen, Beine ausschütteln"],lab:"Pause · 2 Min"})}
+  [COOL[0],COOL[4]].forEach(c=>st.push({k:"cool",...c}));
+  return st;
+}
+function lastReps(n,r){const h=hist.find(x=>x.t===T&&x.reps&&x.reps[n]);return h?h.reps[n][r-1]??null:null}
 function buildTrain(){
   const st=[{k:"ready",n:"Bereit machen",d:8,c:["Gleich geht’s los mit dem Aufwärmen"]}];
   WARM.forEach(w=>st.push({k:"warm",...w}));
   const p=timing(),ex=EX[T];
   for(let r=1;r<=2;r++)ex.forEach((e,i)=>{
-    st.push({k:"work",n:e.n,v:exV(e),c:e.c,d:e.hold?exHold(e):p.w,sides:e.sides,li:li(e),lab:`Übung ${i+1}/${ex.length} · Runde ${r}/2`});
+    st.push({k:"work",n:e.n,v:exV(e),c:e.c,d:e.hold?exHold(e):p.w,sides:e.sides,li:li(e),hold:!!(e.hold||e.noReps),r,lab:`Übung ${i+1}/${ex.length} · Runde ${r}/2`});
     if(!(r===2&&i===ex.length-1))st.push({k:"rest",n:"Pause",d:p.r,c:["Locker bewegen, durchatmen"],lab:`Pause · Runde ${r}/2`});
   });
   COOL.forEach(c=>st.push({k:"cool",...c}));
@@ -484,6 +561,11 @@ function load(i,announce){
   else{$("exname").textContent=s.n;$("exvar").textContent=s.v?(s.v+(s.sides?" · Seitenwechsel bei Halbzeit":"")):(s.sides?"Seitenwechsel bei Halbzeit":"");$("cues").innerHTML=s.c.map(c=>`<li>${c}</li>`).join("");$("nxt").innerHTML=nx?`Danach: <b>${nx.n}</b>`:"Danach: fertig"}
   $("side").textContent=s.sides?"Seite 1":"";
   $("ring").hidden=false;$("tin").hidden=true;ts=null;
+  const pv=S[idx-1];curH=null;$("rlog").hidden=true;
+  if(mode==="train"&&pv&&pv.k==="work"&&!pv.hold&&(s.k==="rest"||s.k==="cool")){
+    const key=pv.n;REPS[key]=REPS[key]||[];if(REPS[key][pv.r-1]==null)REPS[key][pv.r-1]=lastReps(key,pv.r);
+    curH={key,r:pv.r};$("rlN").textContent=pv.n+" · Runde "+pv.r;$("rlV").textContent=REPS[key][pv.r-1]??"–";$("rlog").hidden=false;
+  }
   if(isTest(s)){
     const prev=TESTS.find(x=>x[s.key]!=null);
     ts={phase:s.k==="treps"?"done":"idle",t0:0,val:s.k==="treps"?(prev?prev[s.key]:0):0,ann:0};
@@ -549,7 +631,7 @@ function start(type){
   try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume&&ac.resume()}catch(e){}
   try{window.speechSynthesis&&window.speechSynthesis.getVoices()}catch(e){}
   store.set("kp_T",T);store.set("kp_voice",$("optVoice").checked);store.set("kp_beep",$("optBeep").checked);
-  mode=type;RES={};S=type==="test"?buildTest():buildTrain();tot=total(S);running=true;startTs=Date.now();
+  mode=type;RES={};REPS={};S=type==="test"?buildTest():type==="iso"?buildIso():buildTrain();tot=total(S);running=true;startTs=Date.now();
   $("home").hidden=true;$("fin").hidden=true;$("run").hidden=false;
   lock();load(0,true);clearInterval(timer);timer=setInterval(tick,200);
 }
@@ -572,12 +654,18 @@ function finish(){
     $("finTxt").textContent=rows.length?"Monatstest erledigt. Deine Stufen sind angepasst:":"Monatstest beendet, ohne Ergebnisse.";
     if(rows.length){$("finDet").innerHTML=rows.join("");$("finDet").hidden=false}
     $("finNote").textContent="Ergebnisse und Stufen sind auf diesem Gerät gespeichert.";
+  }else if(mode==="iso"){
+    hist.unshift({d:Date.now(),type:"iso",hold:ISO,min});
+    $("finTxt").textContent=`Blutdruck-Block · 4 × ${fmt(ISO)}`;
+    $("finNote").textContent="Gespeichert. Ziel sind 3 Blutdruck-Blöcke pro Woche.";
   }else{
-    hist.unshift({d:Date.now(),t:T,lv:{...LV},min});
+    hist.unshift({d:Date.now(),t:T,lv:{...LV},min,reps:Object.fromEntries(Object.entries(REPS).filter(([k,v])=>v.some(x=>x!=null)))});
     $("finTxt").textContent=`Training ${T} · ${fmt(tot)} Min`;
     $("finNote").textContent="Die Einheit ist in „Letzte Einheiten“ gespeichert (nur auf diesem Gerät).";
   }
-  hist=hist.slice(0,60);store.set("kp_hist",hist);
+  hist=hist.slice(0,200);store.set("kp_hist",hist);
+  $("rpeCard").hidden=mode==="test";
+  $("rpe").innerHTML=Array.from({length:10},(_,i)=>`<button type="button" data-v="${i+1}" aria-pressed="false">${i+1}</button>`).join("");
   $("run").hidden=true;$("fin").hidden=false;
 }
 function goHome(){
@@ -596,6 +684,14 @@ $("skip").addEventListener("click",()=>{next()});
 $("back").addEventListener("click",()=>{const s=S[idx];const el=isTest(s)?9e9:s.d*1000-rem;load(el>3000||idx===0?idx:idx-1,true);if(!running)paint()});
 $("quit").addEventListener("click",()=>{const q=$("quit");if(quitArm){running=false;clearInterval(timer);try{wl&&wl.release()}catch(e){};try{speechSynthesis.cancel()}catch(e){};quitArm=false;q.classList.remove("arm");q.textContent="Beenden";$("run").hidden=true;$("home").hidden=false;renderHome();return}quitArm=true;q.classList.add("arm");q.textContent="Wirklich beenden?";setTimeout(()=>{quitArm=false;q.classList.remove("arm");q.textContent="Beenden"},3000)});
 $("home2").addEventListener("click",goHome);
+$("rpe").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!hist.length)return;hist[0].rpe=+b.dataset.v;store.set("kp_hist",hist);[...$("rpe").children].forEach(x=>x.setAttribute("aria-pressed",x===b))});
+$("rlog").addEventListener("click",e=>{const b=e.target.closest("button[data-d]");if(!b||!curH)return;const a=REPS[curH.key],c=a[curH.r-1];a[curH.r-1]=c==null?8:Math.max(0,c+ +b.dataset.d);$("rlV").textContent=a[curH.r-1]});
+$("isoD").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;ISO=+b.dataset.v;store.set("kp_iso",ISO);renderHome()});
+$("goiso").addEventListener("click",()=>start("iso"));
+$("expCopy").addEventListener("click",()=>{const t=csv();const ok=()=>{$("expMsg").textContent="In die Zwischenablage kopiert. Du kannst es z. B. in eine E-Mail oder Tabelle einfügen."};
+  const fb=()=>{$("expTxt").hidden=false;$("expTxt").value=t;$("expTxt").select();$("expMsg").textContent="Kopieren ging nicht automatisch. Der Text ist markiert, bitte selbst kopieren."};
+  try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}});
+$("expSave").addEventListener("click",()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv()],{type:"text/csv;charset=utf-8"}));a.download="kraftplan-"+new Date().toISOString().slice(0,10)+".csv";document.body.appendChild(a);a.click();a.remove();$("expMsg").textContent="Datei wird gespeichert. In der Claude-Ansicht geht das nicht, in der installierten App schon. Sonst „Kopieren“ verwenden."}catch(e){$("expMsg").textContent="Speichern ging nicht. Bitte „Kopieren“ verwenden."}});
 
 renderHome();
 })();
