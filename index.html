@@ -69,12 +69,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 .note{font-size:.85rem;color:var(--muted);margin:0}
 
 /* run screen */
-#run{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+#run{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding:calc(env(safe-area-inset-top,0px) + 12px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 14px) max(16px,env(safe-area-inset-left,0px));
   --ph:var(--work)}
 #run.k-warm{--ph:var(--warm)} #run.k-rest,#run.k-ready{--ph:var(--rest)} #run.k-cool,#run.k-walk{--ph:var(--cool)}
 #run::before{content:"";position:absolute;inset:0;background:var(--ph);opacity:.10;pointer-events:none}
-.rin{position:relative;max-width:560px;width:100%;margin:0 auto;flex:1;display:flex;flex-direction:column;gap:10px;min-height:0}
+.rin{position:relative;max-width:560px;width:100%;margin:0 auto;flex:1 0 auto;display:flex;flex-direction:column;gap:10px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .tag{font-family:var(--f-display);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ph);font-size:1.05rem}
 .x{font:inherit;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer;font-size:.9rem}
@@ -83,7 +83,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 .bar i{display:block;height:100%;background:var(--ph);width:0;transition:width .3s linear}
 .ex{font-family:var(--f-display);font-weight:700;font-size:clamp(2rem,9vw,2.8rem);line-height:1.02;margin:6px 0 0;text-wrap:balance}
 .var{color:var(--ph);font-weight:600;margin:0}
-.stage{flex:1;display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px;align-items:center;min-height:0}
+.stage{flex:1 0 auto;display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px;align-items:center;min-height:150px}
 .fig{width:100%;aspect-ratio:200/155;max-height:42vh;max-width:100%;margin:0 auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:14px}
 .ring{width:100%;max-width:220px;aspect-ratio:1;position:relative;margin:0 auto}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -98,7 +98,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 .cues{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:2px}
 .nxt{font-size:.95rem;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
 .nxt b{color:var(--ink)}
-.ctl{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:8px}
+.ctl{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:8px;position:sticky;bottom:0;z-index:2;background:var(--bg);padding-top:8px;margin-top:auto}
+.ctl::before{content:"";position:absolute;inset:0;background:var(--ph);opacity:.10;pointer-events:none;z-index:-1}
 .ctl button{font-family:var(--f-display);font-weight:600;font-size:1.2rem;border-radius:14px;padding:14px 6px;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
 .ctl .main{background:var(--ph);border-color:var(--ph);color:var(--on-accent);font-size:1.5rem}
 .meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -186,6 +187,15 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
     <div id="tstat"></div>
     <ul class="list hist" id="tlist" hidden></ul>
     <button class="sec" id="gotest" type="button">Monatstest starten · ca. 16 Min</button>
+    <details id="tman">
+      <summary class="note" style="cursor:pointer">Testwerte nachtragen oder korrigieren</summary>
+      <div class="lvrow"><label for="mPush"><b>Liegestütze</b><small>Anzahl</small></label><input id="mPush" type="number" inputmode="numeric" min="0" max="200" style="width:5.5em;font:inherit;padding:8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"></div>
+      <div class="lvrow"><label for="mWall"><b>Wandsitzen</b><small>Sekunden</small></label><input id="mWall" type="number" inputmode="numeric" min="0" max="600" style="width:5.5em;font:inherit;padding:8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"></div>
+      <div class="lvrow"><label for="mPlank"><b>Unterarmstütz</b><small>Sekunden</small></label><input id="mPlank" type="number" inputmode="numeric" min="0" max="600" style="width:5.5em;font:inherit;padding:8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"></div>
+      <p class="note">Ein Test vom selben Tag wird überschrieben, sonst kommt ein neuer dazu. Danach werden die Stufen neu eingestellt.</p>
+      <button class="sec" id="mSave" type="button" style="width:100%">Testwerte speichern</button>
+      <p class="note" id="mMsg" aria-live="polite"></p>
+    </details>
   </section>
 
   <section class="card">
@@ -688,6 +698,21 @@ $("rpe").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||
 $("rlog").addEventListener("click",e=>{const b=e.target.closest("button[data-d]");if(!b||!curH)return;const a=REPS[curH.key],c=a[curH.r-1];a[curH.r-1]=c==null?8:Math.max(0,c+ +b.dataset.d);$("rlV").textContent=a[curH.r-1]});
 $("isoD").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;ISO=+b.dataset.v;store.set("kp_iso",ISO);renderHome()});
 $("goiso").addEventListener("click",()=>start("iso"));
+$("tman").addEventListener("toggle",()=>{if(!$("tman").open)return;const t=TESTS[0];if(t&&new Date(t.d).toDateString()===new Date().toDateString()){$("mPush").value=t.push??"";$("mWall").value=t.wall??"";$("mPlank").value=t.plank??""}});
+$("mSave").addEventListener("click",()=>{
+  const num=id=>{const v=$(id).value.trim();if(v==="")return null;const n=Math.round(+v);return isFinite(n)&&n>=0?n:NaN};
+  const e={push:num("mPush"),wall:num("mWall"),plank:num("mPlank")};
+  if(Object.values(e).some(v=>Number.isNaN(v))){$("mMsg").textContent="Bitte nur ganze Zahlen eintragen.";return}
+  if(Object.values(e).every(v=>v==null)){$("mMsg").textContent="Bitte mindestens einen Wert eintragen.";return}
+  const t=TESTS[0],today=t&&new Date(t.d).toDateString()===new Date().toDateString();
+  if(today){["push","wall","plank"].forEach(k=>{if(e[k]!=null)t[k]=e[k]})}else{TESTS.unshift({d:Date.now(),...e});TESTS=TESTS.slice(0,24)}
+  const cur=TESTS[0],old={...LV};
+  if(cur.push!=null)LV.o=lvPush(cur.push);if(cur.wall!=null)LV.b=lvHold(cur.wall);if(cur.plank!=null)LV.r=lvHold(cur.plank);
+  store.set("kp_tests",TESTS);store.set("kp_lv",LV);
+  if(!today){hist.unshift({d:Date.now(),type:"test",min:0});store.set("kp_hist",hist)}
+  renderHome();
+  $("mMsg").textContent=`Gespeichert. Stufen: Oberkörper ${old.o} → ${LV.o}, Beine ${old.b} → ${LV.b}, Rumpf ${old.r} → ${LV.r}.`;
+});
 $("expCopy").addEventListener("click",()=>{const t=csv();const ok=()=>{$("expMsg").textContent="In die Zwischenablage kopiert. Du kannst es z. B. in eine E-Mail oder Tabelle einfügen."};
   const fb=()=>{$("expTxt").hidden=false;$("expTxt").value=t;$("expTxt").select();$("expMsg").textContent="Kopieren ging nicht automatisch. Der Text ist markiert, bitte selbst kopieren."};
   try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}});
