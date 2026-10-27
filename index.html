@@ -493,7 +493,8 @@ function renderHome(){
   $("tlist").innerHTML=TESTS.slice(0,6).map(x=>`<li><span>${dstr(x.d)}</span><span>${x.push??"–"} Liegest. · Wand ${x.wall!=null?fmt(x.wall):"–"} · Stütz ${x.plank!=null?fmt(x.plank):"–"}</span></li>`).join("");
   const wk=weekKey(Date.now()),cnt=hist.filter(h=>weekKey(h.d)===wk&&!h.light&&h.type!=="iso").length,icnt=hist.filter(h=>weekKey(h.d)===wk&&h.type==="iso").length;
   [...$("dots").children].forEach((d,i)=>d.classList.toggle("on",i<cnt));
-  $("weektxt").textContent=`Diese Woche: ${Math.min(cnt,2)} von 2 Einheiten`+(cnt>=2?" ✓":` · als Nächstes Training ${T}`);
+  const tcnt=hist.filter(h=>weekKey(h.d)===wk&&h.type==="test").length;
+  $("weektxt").textContent=`Diese Woche: ${Math.min(cnt,2)} von 2 Einheiten`+(tcnt?" (inkl. Monatstest)":"")+(cnt>=2?" ✓":` · als Nächstes Training ${T}`);
   if(hist.length){$("histcard").hidden=false;$("hist").innerHTML=hist.slice(0,10).map(h=>`<li><span>${dstr(h.d)} · ${h.type==="test"?"Monatstest":h.type==="iso"?"Blutdruck-Block "+fmt(h.hold||60):"Training "+h.t}</span><span>${h.rpe?"Anstr. "+h.rpe+" · ":""}${h.min?h.min+" Min":""}</span></li>`).join("")}
   [...$("isoD").children].forEach(b=>b.setAttribute("aria-pressed",+b.dataset.v===ISO));
   $("isoStat").innerHTML=`<span class="pill ${icnt>=3?"ok":"warn"}">Diese Woche: ${Math.min(icnt,3)} von 3${icnt>=3?" ✓":""}</span>`;
@@ -674,7 +675,7 @@ function finish(){
     $("finNote").textContent="Die Einheit ist in „Letzte Einheiten“ gespeichert (nur auf diesem Gerät).";
   }
   hist=hist.slice(0,200);store.set("kp_hist",hist);
-  $("rpeCard").hidden=mode==="test";
+  $("rpeCard").hidden=false;
   $("rpe").innerHTML=Array.from({length:10},(_,i)=>`<button type="button" data-v="${i+1}" aria-pressed="false">${i+1}</button>`).join("");
   $("run").hidden=true;$("fin").hidden=false;
 }
