@@ -124,7 +124,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
     <h2>Training</h2>
     <div class="seg" id="segT">
       <button type="button" id="tA" data-v="A"><b>Training A</b><small>Beine · Drücken · Rumpf</small></button>
-      <button type="button" id="tB" data-v="B"><b>Training B</b><small>Ausfallschritt · Rücken · Seite</small></button>
+      <button type="button" id="tB" data-v="B"><b>Training B</b><small>Ausfallschritt · Drücken · Rücken · Rumpf</small></button>
     </div>
     <div class="pv"><canvas id="pvc" aria-label="Vorschau der Übung"></canvas><span class="cap" id="pvcap">Übung antippen für die Vorschau</span></div>
     <ol class="list" id="exlist"></ol>
@@ -215,10 +215,12 @@ A:[
  {n:"Liegestütz erhöht",c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche"]},
  {n:"Beckenheben",c:["Rückenlage, Füße aufgestellt, Arme gestreckt neben dem Körper am Boden","Becken heben, bis Knie, Hüfte und Schultern eine Linie bilden","Oben kurz halten, ausatmen"],v:["Beidbeinig","Beidbeinig, oben 2 s halten","Einbeinig, Seiten abwechseln"]},
  {n:"Bird-Dog",c:["Vierfüßlerstand, Rücken ruhig","Langsam strecken, nicht ins Hohlkreuz","Seiten abwechseln"],v:["Nur Arm oder nur Bein","Arm und Bein gegengleich","Gegengleich, 2 s halten"]},
- {n:"Wandsitzen",c:["Rücken an der Wand","Knie nur leicht gebeugt","Ruhig weiteratmen, nicht pressen"],v:["Hoch stehen, ca. 120° im Knie","Etwas tiefer, schmerzfrei","Ca. 100–110° im Knie"],hold:[30,40,45]}
+ {n:"Wandsitzen",c:["Rücken an der Wand","Knie nur leicht gebeugt","Ruhig weiteratmen, nicht pressen"],v:["Hoch stehen, ca. 120° im Knie","Etwas tiefer, schmerzfrei","Ca. 100–110° im Knie"],hold:[30,40,45]},
+ {n:"Liegestütz eng",c:["Hände schulterbreit oder etwas enger","Ellbogen eng am Körper nach hinten","Beim Wegdrücken ausatmen, nicht pressen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche"]}
 ],
 B:[
  {n:"Kurzer Ausfallschritt",c:["Eine Hand an der Stuhllehne","Hinteres Knie ein Stück absenken","Oberkörper aufrecht"],v:["Kleine Bewegung","Etwas tiefer, schmerzfrei","Ohne Stütze, wenn sicher"],sides:true},
+ {n:"Liegestütz erhöht",c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche"]},
  {n:"Bauchlage Y-T",c:["Bauchlage, Stirn auf ein Handtuch","Arme als Y nach vorn, dann als T zur Seite","Daumen nach oben, Arme nur wenige cm heben, Kopf bleibt unten"],v:["Kurz anheben, wieder ablegen","Oben 2 s halten","Zwischen Y und T wechseln, ohne abzulegen"]},
  {n:"Wadenheben",c:["Hände an der Wand","Langsam auf die Zehen","1 s halten, langsam ab"],v:["Beidbeinig","Beidbeinig, 3 s ablassen","Einbeinig, Seiten abwechseln"]},
  {n:"Seitstütz",c:["Unterarm unter der Schulter","Hüfte heben, Körper gerade","Weiteratmen"],v:["Auf den Knien","Auf den Knien, ruhig halten","Auf den Füßen"],sides:true},
@@ -273,7 +275,7 @@ const AN={
  chest:D({props:["door"],eb:-1,seg:2,hold:.4,kf:[{x:101,y:72,t:0,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[103,76]},{x:107,y:73,t:8,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[110,77]}]}),
  breathe:D({props:["chairL"],segs:[4,6],hold:0,kf:[{x:84,y:95,t:-3,hd:0,fa:[114,130],fb:[111,130],ha:[100,82],hb:[98,84]},{x:84,y:94,t:1,hd:-4,fa:[114,130],fb:[111,130],ha:[102,80],hb:[100,82]}]})
 };
-const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz erhöht":"pushup","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
+const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz erhöht":"pushup","Liegestütz eng":"pushup","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
 const PROPS={
  chairL:[[56,99,88,99],[58,99,58,130],[86,99,86,130],[58,99,56,62]],
  table:[[148,82,196,82],[152,82,152,130],[192,82,192,130]],
@@ -391,7 +393,7 @@ function build(){
   else{
     const p=P[PH],ex=EX[T];
     for(let r=1;r<=2;r++)ex.forEach((e,i)=>{
-      st.push({k:"work",n:e.n,v:e.v[PH],c:e.c,d:e.hold?e.hold[PH]:p.w,sides:e.sides,lab:`Übung ${i+1}/5 · Runde ${r}/2`});
+      st.push({k:"work",n:e.n,v:e.v[PH],c:e.c,d:e.hold?e.hold[PH]:p.w,sides:e.sides,lab:`Übung ${i+1}/${ex.length} · Runde ${r}/2`});
       if(!(r===2&&i===ex.length-1))st.push({k:"rest",n:"Pause",d:p.r,c:["Locker bewegen, durchatmen"],lab:`Pause · Runde ${r}/2`});
     });
   }
