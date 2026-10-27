@@ -303,6 +303,14 @@ const AN={
  chest:D({props:["door"],eb:-1,seg:2,hold:.4,kf:[{x:101,y:72,t:0,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[103,76]},{x:107,y:73,t:8,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[110,77]}]}),
  pushup_3:D({eb:-1,segs:[1.8,1.4],kf:[{x:117.1,y:103.6,t:66,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]},{x:120.9,y:116.7,t:79,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]}]}),
  plank:D({segs:[2,2],hold:0,kf:[{x:98.6,y:116.8,t:79,hd:0,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]},{x:98.6,y:116,t:79,hd:-3,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]}]}),
+ pushup_2:D({props:["bench"],segs:[1.8,1.4],kf:[{x:113.8,y:89.2,t:49.8,hd:0,fa:[68,128],fb:[65,128],ha:[152,105],hb:[149,105]},{x:121.3,y:100.5,t:62.7,hd:0,fa:[68,128],fb:[65,128],ha:[152,105],hb:[149,105]}]}),
+ squat_3:D({feet:true,segs:[3,1,1.3],hold:0,kf:[X(stand,{t:4,ha:[140,40],hb:[137,42]}),X(stand,{x:82,y:95,t:38,ha:[140,66],hb:[137,68]}),X(stand,{x:82,y:95,t:38,ha:[140,66],hb:[137,68]})]}),
+ bridge_2:D({eb:-1,segs:[1.4,1.8],hold:.3,kf:[{x:95,y:123,t:-90,hd:0,fa:[147,93],fb:[135,127],ha:[99.5,126],hb:[99,124.5]},{x:92,y:102,t:-121,hd:31,fa:[143.4,71.1],fb:[135,127],ha:[101,126],hb:[100,124.5]}]}),
+ bridge_3:D({eb:-1,segs:[1.4,3,1.8],hold:0,kf:[{x:95,y:123,t:-90,hd:0,fa:[147,93],fb:[135,127],ha:[99.5,126],hb:[99,124.5]},{x:92,y:102,t:-121,hd:31,fa:[143.4,71.1],fb:[135,127],ha:[101,126],hb:[100,124.5]},{x:92,y:102,t:-121,hd:31,fa:[143.4,71.1],fb:[135,127],ha:[101,126],hb:[100,124.5]}]}),
+ calf_2:D({props:["wallR"],feet:true,segs:[1,1.8],hold:.3,kf:[{x:100,y:71,t:8,hd:0,fa:[102,130],fb:[84,110],ha:[139,50],hb:[137,52]},{x:100,y:62,t:8,hd:0,fa:[102,122],fb:[84,101],ha:[139,44],hb:[137,46]}]}),
+ calf_3:D({props:["wallR"],feet:true,segs:[1,2,3],hold:0,kf:[{x:100,y:71,t:8,hd:0,fa:[102,130],fb:[84,110],ha:[139,50],hb:[137,52]},{x:100,y:62,t:8,hd:0,fa:[102,122],fb:[84,101],ha:[139,44],hb:[137,46]},{x:100,y:62,t:8,hd:0,fa:[102,122],fb:[84,101],ha:[139,44],hb:[137,46]}]}),
+ lunge_2:D({feet:true,segs:[1.8,1.4],kf:[{x:94,y:74,t:0,hd:0,fa:[116,130],fb:[72,130],ha:[104,73],hb:[101,74]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[104,91],hb:[101,92]}]}),
+ lunge_3:D({feet:true,segs:[3,1,1.3],hold:0,kf:[{x:94,y:74,t:0,hd:0,fa:[116,130],fb:[72,130],ha:[104,73],hb:[101,74]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[104,91],hb:[101,92]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[104,91],hb:[101,92]}]}),
  breathe:D({props:["chairL"],segs:[4,6],hold:0,kf:[{x:84,y:95,t:-3,hd:0,fa:[114,130],fb:[111,130],ha:[100,82],hb:[98,84]},{x:84,y:94,t:1,hd:-4,fa:[114,130],fb:[111,130],ha:[102,80],hb:[100,82]}]})
 };
 const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz":"pushup","Liegestütz eng":"pushup","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
@@ -310,6 +318,7 @@ const PROPS={
  chairL:[[56,99,88,99],[58,99,58,130],[86,99,86,130],[58,99,56,62]],
  table:[[148,82,196,82],[152,82,152,130],[192,82,192,130]],
  wallL:[[62,-14,62,130]], wallP:[[152,-14,152,130]], towel:[[118,129,140,129]], wallR:[[142,-14,142,130]], door:[[80,-14,80,130],[80,-14,96,-14]],
+ bench:[[146,105,196,105],[148,105,148,130],[194,105,194,130]],
  chairR:[[132,56,132,130],[132,98,162,98],[160,98,160,130]]};
 AN.side_3=AN.side_2;
 function animFor(n,l){const id=AMAP[n];return (l!=null&&l>=0&&AN[id+"_"+l])||AN[id]||null}
