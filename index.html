@@ -279,13 +279,13 @@ const quad={x:80,y:97,t:78,hd:0,fa:[50,129],fb:[47,129],ha:[115,129],hb:[112,129
 const dbBase={x:95,y:123,t:-90,hd:0,fa:[125,93],fb:[122,95],ha:[60,83],hb:[57,84]};
 const AN={
  squat:D({props:["chairL"],feet:true,segs:[2,1.5],kf:[X(stand,{t:4,ha:[140,40],hb:[137,42]}),X(stand,{x:82,y:95,t:38,ha:[140,66],hb:[137,68]})]}),
- pushup:D({props:["table"],segs:[1.8,1.4],kf:[{x:97.4,y:87.6,t:45,hd:0,fa:[55,130],fb:[52,130],ha:[155,82],hb:[152,82]},{x:104.1,y:95.6,t:55,hd:0,fa:[55,130],fb:[52,130],ha:[155,82],hb:[152,82]}]}),
+ pushup:D({props:["table"],ep:[-1,-.6],segs:[1.8,1.4],kf:[{x:107,y:79.25,t:35.7,hd:0,fa:[72,128],fb:[69,128],ha:[152,82],hb:[149,82]},{x:117.6,y:89.25,t:49.6,hd:0,fa:[72,128],fb:[69,128],ha:[152,82],hb:[149,82]}]}),
  bridge:D({eb:-1,segs:[1.4,1.8],hold:.3,kf:[{x:95,y:123,t:-90,hd:0,fa:[138,127],fb:[135,127],ha:[99.5,126],hb:[99,124.5]},{x:92,y:102,t:-121,hd:31,fa:[138,127],fb:[135,127],ha:[101,126],hb:[100,124.5]}]}),
- birddog:D({seg:1.4,hold:.35,kf:[quad,X(quad,{fb:[22,93],ha:[155,86]}),quad,X(quad,{fa:[22,95],hb:[154,88]})]}),
+ birddog:D({ep:[-1,0],seg:1.4,hold:.35,kf:[quad,X(quad,{fb:[22,93],ha:[155,86]}),quad,X(quad,{fa:[22,95],hb:[154,88]})]}),
  wallsit:D({props:["wallL"],seg:2,hold:.1,kf:[{x:70,y:88,t:0,hd:0,fa:[102,130],fb:[99,130],ha:[96,84],hb:[93,85]},{x:70,y:89,t:0,hd:0,fa:[102,130],fb:[99,130],ha:[96,85],hb:[93,86]}]}),
  lunge:D({props:["chairR"],feet:true,segs:[1.8,1.4],kf:[{x:94,y:74,t:0,hd:0,fa:[116,130],fb:[72,130],ha:[130,58],hb:[108,74]},{x:93,y:92,t:2,hd:0,fa:[116,130],fb:[72,130],ha:[130,62],hb:[108,92]}]}),
  ytt:D({top:true,seg:1.1,hold:.35,kf:[{hx:165,dy:49,lift:0},{hx:165,dy:49,lift:1},{hx:165,dy:49,lift:0},{hx:126,dy:66,lift:0},{hx:126,dy:66,lift:1},{hx:126,dy:66,lift:0}]}),
- pushup_0:D({props:["wallP"],feet:true,segs:[1.8,1.4],kf:[{x:106.5,y:72.9,t:18,hd:0,fa:[88,130],fb:[85,130],ha:[151,42],hb:[149,44]},{x:116.2,y:77,t:28,hd:0,fa:[88,130],fb:[85,130],ha:[151,42],hb:[149,44]}]}),
+ pushup_0:D({props:["wallP"],ep:[-.5,1],feet:true,segs:[1.8,1.4],kf:[{x:98.81,y:75.37,t:28.7,hd:0,fa:[70,129],fb:[67,129],ha:[151,64],hb:[149,65]},{x:111.25,y:84.43,t:43.4,hd:0,fa:[70,129],fb:[67,129],ha:[151,64],hb:[149,65]}]}),
  deadbug_0:D({eb:-1,seg:1.4,hold:.3,kf:[X(dbBase,{ha:[99.5,126],hb:[99,124.5]}),X(dbBase,{ha:[99.5,126],hb:[99,124.5],fa:[132,125]}),X(dbBase,{ha:[99.5,126],hb:[99,124.5]}),X(dbBase,{ha:[99.5,126],hb:[99,124.5],fb:[129,125]})]}),
  calf:D({props:["wallR"],feet:true,segs:[1,1.8],hold:.3,kf:[{x:100,y:71,t:8,hd:0,fa:[102,130],fb:[99,130],ha:[139,50],hb:[137,52]},{x:100,y:62,t:8,hd:0,fa:[102,122],fb:[99,122],ha:[139,44],hb:[137,46]}]}),
  side:D({front:true,seg:1.6,hold:.45,kf:[{lift:0},{lift:1}]}),
@@ -294,16 +294,16 @@ const AN={
  march:D({feet:true,seg:.55,hold:0,kf:[X(stand,{fa:[110,105],ha:[92,72],hb:[116,60]}),X(stand,{fb:[108,105],ha:[116,60],hb:[90,72]})]}),
  arms:D({seg:.3,hold:0,ease:false,kf:[180,135,90,45,0,-45,-90,-135].map(f=>{const r=f*Math.PI/180;return X(stand,{t:0,ha:[100+39*Math.sin(r),35-39*Math.cos(r)],hb:[98+39*Math.sin(r),36-39*Math.cos(r)]})})}),
  hips:D({seg:.6,hold:0,kf:[[94,71,5],[100,69,0],[106,71,-5],[100,73,0]].map(([x,y,t])=>X(stand,{x,y,t,ha:[x+11,y],hb:[x+9,y+1]}))}),
- catcow:D({seg:1.6,hold:.3,kf:[X(quad,{y:92,hd:35}),X(quad,{y:99,hd:-25})]}),
+ catcow:D({ep:[-1,0],seg:1.6,hold:.3,kf:[X(quad,{y:95,hd:35}),X(quad,{y:97.5,hd:-25})]}),
  minisquat:D({feet:true,segs:[1.3,1.1],kf:[X(stand,{t:4,ha:[138,42],hb:[135,44]}),X(stand,{x:88,y:88,t:25,ha:[140,58],hb:[137,60]})]}),
  blades:D({seg:1,hold:.3,kf:[X(stand,{t:0,ha:[124,56],hb:[121,58]}),X(stand,{t:0,ha:[108,58],hb:[105,60]})]}),
  walk:D({feet:true,seg:.45,hold:0,ease:false,kf:[X(stand,{y:72,fa:[116,130],fb:[84,130],ha:[110,72],hb:[90,72]}),X(stand,{fa:[100,130],fb:[102,118],ha:[101,75],hb:[99,75]}),X(stand,{y:72,fa:[84,130],fb:[116,130],ha:[90,72],hb:[110,72]}),X(stand,{fa:[102,118],fb:[100,130],ha:[101,75],hb:[99,75]})]}),
  hipflex:D({feet:true,seg:2,hold:.4,kf:[{x:96,y:76,t:0,hd:0,fa:[120,130],fb:[64,130],ha:[106,76],hb:[104,77]},{x:101,y:80,t:-6,hd:0,fa:[120,130],fb:[64,130],ha:[111,80],hb:[109,81]}]}),
  calfst:D({props:["wallR"],feet:true,seg:2,hold:.4,kf:[{x:98,y:75,t:18,hd:0,fa:[118,130],fb:[66,130],ha:[141,42],hb:[139,44]},{x:102,y:77,t:24,hd:0,fa:[118,130],fb:[66,130],ha:[141,42],hb:[139,44]}]}),
  chest:D({props:["door"],eb:-1,seg:2,hold:.4,kf:[{x:101,y:72,t:0,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[103,76]},{x:107,y:73,t:8,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[110,77]}]}),
- pushup_3:D({eb:-1,segs:[1.8,1.4],kf:[{x:117.1,y:103.6,t:66,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]},{x:120.9,y:116.7,t:79,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]}]}),
- plank:D({segs:[2,2],hold:0,kf:[{x:98.6,y:116.8,t:79,hd:0,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]},{x:98.6,y:116,t:79,hd:-3,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]}]}),
- pushup_2:D({props:["bench"],segs:[1.8,1.4],kf:[{x:113.8,y:89.2,t:49.8,hd:0,fa:[68,128],fb:[65,128],ha:[152,105],hb:[149,105]},{x:121.3,y:100.5,t:62.7,hd:0,fa:[68,128],fb:[65,128],ha:[152,105],hb:[149,105]}]}),
+ pushup_3:D({ep:[-1,-.6],segs:[1.8,1.4],kf:[{x:117.1,y:103.6,t:66,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]},{x:120.9,y:116.7,t:79,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]}]}),
+ plank:D({ep:[-1,.4],segs:[2,2],hold:0,kf:[{x:98.6,y:116.8,t:79,hd:0,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]},{x:98.6,y:116,t:79,hd:-3,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]}]}),
+ pushup_2:D({props:["bench"],ep:[-1,-.6],segs:[1.8,1.4],kf:[{x:113.8,y:89.2,t:49.8,hd:0,fa:[68,128],fb:[65,128],ha:[152,105],hb:[149,105]},{x:121.3,y:100.5,t:62.7,hd:0,fa:[68,128],fb:[65,128],ha:[152,105],hb:[149,105]}]}),
  squat_3:D({feet:true,segs:[3,1,1.3],hold:0,kf:[X(stand,{t:4,ha:[140,40],hb:[137,42]}),X(stand,{x:82,y:95,t:38,ha:[140,66],hb:[137,68]}),X(stand,{x:82,y:95,t:38,ha:[140,66],hb:[137,68]})]}),
  bridge_2:D({eb:-1,segs:[1.4,1.8],hold:.3,kf:[{x:95,y:123,t:-90,hd:0,fa:[147,93],fb:[135,127],ha:[99.5,126],hb:[99,124.5]},{x:92,y:102,t:-121,hd:31,fa:[143.4,71.1],fb:[135,127],ha:[101,126],hb:[100,124.5]}]}),
  bridge_3:D({eb:-1,segs:[1.4,3,1.8],hold:0,kf:[{x:95,y:123,t:-90,hd:0,fa:[147,93],fb:[135,127],ha:[99.5,126],hb:[99,124.5]},{x:92,y:102,t:-121,hd:31,fa:[143.4,71.1],fb:[135,127],ha:[101,126],hb:[100,124.5]},{x:92,y:102,t:-121,hd:31,fa:[143.4,71.1],fb:[135,127],ha:[101,126],hb:[100,124.5]}]}),
@@ -353,7 +353,7 @@ function drawFig(cv,A,time){
   const hr=(P.t+P.hd)*Math.PI/180,head=[nk[0]+9*Math.sin(hr),nk[1]-9*Math.cos(hr)];
   const seg=(pts,color,wd)=>{c.strokeStyle=color;c.lineWidth=wd;c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.stroke()};
   const leg=(f,color)=>{const[k,e]=ik(hip,f,30,30,A.kb);const pts=[hip,k,e];if(A.feet){pts.push([e[0]+9,e[1]>=118?GR:e[1]+3])}seg(pts,color,7)};
-  const arm=(hd,color)=>{const[el,e]=ik(sh,hd,21,20,A.eb);seg([sh,el,e],color,5.5)};
+  const arm=(hd,color)=>{let r=ik(sh,hd,21,20,A.eb);if(A.ep){const r2=ik(sh,hd,21,20,-A.eb),m=[(sh[0]+r[1][0])/2,(sh[1]+r[1][1])/2],sc=q=>(q[0]-m[0])*A.ep[0]+(q[1]-m[1])*A.ep[1];if(sc(r2[0])>sc(r[0]))r=r2}seg([sh,r[0],r[1]],color,5.5)};
   leg(P.fb,mut);arm(P.hb,mut);
   seg([hip,sh],ink,12);seg([sh,nk],ink,5);
   c.fillStyle=ink;c.beginPath();c.arc(head[0],head[1],8,0,Math.PI*2);c.fill();
