@@ -102,6 +102,19 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 .ctl button{font-family:var(--f-display);font-weight:600;font-size:1.2rem;border-radius:14px;padding:14px 6px;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
 .ctl .main{background:var(--ph);border-color:var(--ph);color:var(--on-accent);font-size:1.5rem}
 .meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lvrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding-top:8px}
+.lvrow b{font-weight:600}
+.lvrow small{display:block;color:var(--muted);font-size:.85rem}
+.stp{display:flex;align-items:center;gap:6px}
+.stp button{font:inherit;font-weight:700;font-size:1.2rem;width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.stp button[disabled]{opacity:.35;cursor:default}
+.stp span{font-family:var(--f-display);font-size:1.2rem;font-weight:600;min-width:4.2em;text-align:center;font-variant-numeric:tabular-nums}
+.sec{font-family:var(--f-display);font-weight:600;font-size:1.2rem;letter-spacing:.02em;border:1.5px solid var(--work);color:var(--work);background:transparent;border-radius:12px;padding:12px;cursor:pointer}
+.tin{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.tin output{font-family:var(--f-display);font-weight:600;font-size:clamp(3.2rem,16vw,5.2rem);line-height:1;font-variant-numeric:tabular-nums}
+.tin .u{color:var(--muted);font-size:.9rem}
+.tin .row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+.tin button{font-family:var(--f-display);font-weight:600;font-size:1.15rem;padding:10px 0;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .done{text-align:center;align-items:center;justify-content:center}
 .done .big{font-family:var(--f-display);font-weight:700;font-size:3rem;color:var(--ok);margin:0}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
@@ -131,12 +144,9 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   </section>
 
   <section class="card">
-    <h2>Trainingsphase</h2>
-    <div class="seg" style="--n:3" id="segP">
-      <button type="button" id="p1" data-v="0"><b>Woche 1–2</b><small>30 s / 30 s</small></button>
-      <button type="button" id="p2" data-v="1"><b>Woche 3–4</b><small>45 s / 30 s</small></button>
-      <button type="button" id="p3" data-v="2"><b>ab Woche 5</b><small>45 s / 20 s</small></button>
-    </div>
+    <h2>Deine Stufen</h2>
+    <div id="lvrows"></div>
+    <p class="note">Takt: <span id="timing"></span>. Der Monatstest stellt die Stufen ein, du kannst sie jederzeit selbst ändern.</p>
   </section>
 
   <section class="card">
@@ -148,6 +158,14 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   </section>
 
   <button class="start" id="go" type="button">Start · ca. 20 Min</button>
+
+  <section class="card">
+    <h2>Monatstest</h2>
+    <p class="note">Einmal im Monat: maximale Liegestütze, Wandsitzen und Unterarmstütz. Danach passt die App deine Stufen an. Am besten ausgeruht testen, nicht am Tag nach einem Training.</p>
+    <div id="tstat"></div>
+    <ul class="list hist" id="tlist" hidden></ul>
+    <button class="sec" id="gotest" type="button">Monatstest starten · ca. 16 Min</button>
+  </section>
 
   <section class="card">
     <h2>Regeln</h2>
@@ -178,13 +196,18 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
     </div>
     <div class="stage">
       <canvas class="fig" id="fig" aria-label="Animation der Übung"></canvas>
-      <div class="ring">
+      <div class="ring" id="ring">
         <svg viewBox="0 0 100 100" aria-hidden="true">
           <circle cx="50" cy="50" r="45" fill="none" stroke="var(--line)" stroke-width="6"></circle>
           <circle id="arc" cx="50" cy="50" r="45" fill="none" stroke="var(--ph)" stroke-width="6" stroke-linecap="round" stroke-dasharray="282.74" stroke-dashoffset="0"></circle>
         </svg>
         <div class="t" id="secs" aria-live="off">0</div>
         <div class="side" id="side"></div>
+      </div>
+      <div class="tin" id="tin" hidden>
+        <output id="tv">0</output>
+        <span class="u" id="tu">Wiederholungen</span>
+        <div class="row" id="tstep"><button type="button" data-d="-5">−5</button><button type="button" data-d="-1">−1</button><button type="button" data-d="1">+1</button><button type="button" data-d="5">+5</button></div>
       </div>
     </div>
     <ul class="cues" id="cues"></ul>
@@ -201,31 +224,36 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 <div id="fin" class="wrap done" hidden>
   <p class="big">Geschafft</p>
   <p id="finTxt" class="sub"></p>
-  <p class="note">Die Einheit ist in „Letzte Einheiten“ gespeichert (nur auf diesem Gerät).</p>
+  <ul class="list hist" id="finDet" style="width:100%;text-align:left" hidden></ul>
+  <p class="note" id="finNote">Die Einheit ist in „Letzte Einheiten“ gespeichert (nur auf diesem Gerät).</p>
   <button class="start" id="home2" type="button" style="width:100%">Zurück zur Übersicht</button>
 </div>
 
 <script>
 (function(){
-const P=[ // per phase: work, rest
-  {w:30,r:30,label:"Woche 1–2"},{w:45,r:30,label:"Woche 3–4"},{w:45,r:20,label:"ab Woche 5"}];
+const P=[ // Takt je Gesamtstufe 1–4: Arbeit, Pause
+  {w:30,r:30},{w:45,r:30},{w:45,r:20},{w:45,r:15}];
 const EX={
 A:[
- {n:"Kniebeuge zum Stuhl",c:["Füße hüftbreit, Po nach hinten","Knie zeigen Richtung Zehen","Beim Hochkommen ausatmen"],v:["Kurz hinsetzen, dann aufstehen","Stuhl nur antippen","Antippen, 3 s langsam runter"]},
- {n:"Liegestütz erhöht",c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche"]},
- {n:"Beckenheben",c:["Rückenlage, Füße aufgestellt, Arme gestreckt neben dem Körper am Boden","Becken heben, bis Knie, Hüfte und Schultern eine Linie bilden","Oben kurz halten, ausatmen"],v:["Beidbeinig","Beidbeinig, oben 2 s halten","Einbeinig, Seiten abwechseln"]},
- {n:"Bird-Dog",c:["Vierfüßlerstand, Rücken ruhig","Langsam strecken, nicht ins Hohlkreuz","Seiten abwechseln"],v:["Nur Arm oder nur Bein","Arm und Bein gegengleich","Gegengleich, 2 s halten"]},
- {n:"Wandsitzen",c:["Rücken an der Wand","Knie nur leicht gebeugt","Ruhig weiteratmen, nicht pressen"],v:["Hoch stehen, ca. 120° im Knie","Etwas tiefer, schmerzfrei","Ca. 100–110° im Knie"],hold:[30,40,45]},
- {n:"Liegestütz eng",c:["Hände schulterbreit oder etwas enger","Ellbogen eng am Körper nach hinten","Beim Wegdrücken ausatmen, nicht pressen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche"]}
+ {n:"Kniebeuge zum Stuhl",g:"b",c:["Füße hüftbreit, Po nach hinten","Knie zeigen Richtung Zehen","Beim Hochkommen ausatmen"],v:["Kurz hinsetzen, dann aufstehen","Stuhl nur antippen","Antippen, 3 s langsam runter","Ohne Stuhl bis Sitzhöhe, 3 s runter, unten 1 s halten"]},
+ {n:"Liegestütz",g:"o",tgt:.6,c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche (z. B. Sofakante)","Am Boden (normale Liegestütze)"]},
+ {n:"Beckenheben",g:"b",c:["Rückenlage, Füße aufgestellt, Arme gestreckt neben dem Körper am Boden","Becken heben, bis Knie, Hüfte und Schultern eine Linie bilden","Oben kurz halten, ausatmen"],v:["Beidbeinig","Beidbeinig, oben 2 s halten","Einbeinig, Seiten abwechseln","Einbeinig, oben 3 s halten, Seiten abwechseln"]},
+ {n:"Bird-Dog",g:"r",c:["Vierfüßlerstand, Rücken ruhig","Langsam strecken, nicht ins Hohlkreuz","Seiten abwechseln"],v:["Nur Arm oder nur Bein","Arm und Bein gegengleich","Gegengleich, 2 s halten","Gegengleich, 3 s halten, dann Ellbogen zum Knie"]},
+ {n:"Wandsitzen",g:"b",c:["Rücken an der Wand","Knie nicht über die Zehen","Ruhig weiteratmen, nicht pressen"],v:["Hoch stehen, ca. 120° im Knie","Etwas tiefer, schmerzfrei","Ca. 100–110° im Knie","So tief wie im Test, schmerzfrei"],hold:[30,40,45,60]},
+ {n:"Liegestütz eng",g:"o",tgt:.5,c:["Hände schulterbreit oder etwas enger","Ellbogen eng am Körper nach hinten","Beim Wegdrücken ausatmen, nicht pressen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche (z. B. Sofakante)","Am Boden, Hände schulterbreit"]}
 ],
 B:[
- {n:"Kurzer Ausfallschritt",c:["Eine Hand an der Stuhllehne","Hinteres Knie ein Stück absenken","Oberkörper aufrecht"],v:["Kleine Bewegung","Etwas tiefer, schmerzfrei","Ohne Stütze, wenn sicher"],sides:true},
- {n:"Liegestütz erhöht",c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche"]},
- {n:"Bauchlage Y-T",c:["Bauchlage, Stirn auf ein Handtuch","Arme als Y nach vorn, dann als T zur Seite","Daumen nach oben, Arme nur wenige cm heben, Kopf bleibt unten"],v:["Kurz anheben, wieder ablegen","Oben 2 s halten","Zwischen Y und T wechseln, ohne abzulegen"]},
- {n:"Wadenheben",c:["Hände an der Wand","Langsam auf die Zehen","1 s halten, langsam ab"],v:["Beidbeinig","Beidbeinig, 3 s ablassen","Einbeinig, Seiten abwechseln"]},
- {n:"Seitstütz",c:["Unterarm unter der Schulter","Hüfte heben, Körper gerade","Weiteratmen"],v:["Auf den Knien","Auf den Knien, ruhig halten","Auf den Füßen"],sides:true},
- {n:"Dead Bug",c:["Rückenlage, Knie und Hüfte 90° angewinkelt","Unterer Rücken bleibt am Boden","Langsam, beim Strecken ausatmen"],v:["Hände neben dem Körper am Boden, Ferse abwechselnd Richtung Boden tippen","Arme senkrecht nach oben, Arm und Bein gegengleich strecken","Wie Stufe 2, 2 s in der Streckung halten"]}
+ {n:"Kurzer Ausfallschritt",g:"b",c:["Eine Hand an der Stuhllehne","Hinteres Knie ein Stück absenken","Oberkörper aufrecht"],v:["Kleine Bewegung","Etwas tiefer, schmerzfrei","Ohne Stütze, wenn sicher","Ohne Stütze, 3 s runter, unten 1 s halten"],sides:true},
+ {n:"Liegestütz",g:"o",tgt:.6,c:["Körper gerade wie ein Brett","Brust zur Kante, Ellbogen schräg nach hinten","Beim Wegdrücken ausatmen"],v:["An der Wand","An Tisch oder Arbeitsplatte","An niedrigerer, stabiler Fläche (z. B. Sofakante)","Am Boden (normale Liegestütze)"]},
+ {n:"Bauchlage Y-T",g:"o",c:["Bauchlage, Stirn auf ein Handtuch","Arme als Y nach vorn, dann als T zur Seite","Daumen nach oben, Arme nur wenige cm heben, Kopf bleibt unten"],v:["Kurz anheben, wieder ablegen","Oben 2 s halten","Zwischen Y und T wechseln, ohne abzulegen","Y und T je 3 s halten, ohne abzulegen"]},
+ {n:"Wadenheben",g:"b",c:["Hände an der Wand","Langsam auf die Zehen","1 s halten, langsam ab"],v:["Beidbeinig","Beidbeinig, 3 s ablassen","Einbeinig, Seiten abwechseln","Einbeinig, oben 2 s halten, 3 s ablassen"]},
+ {n:"Seitstütz",g:"r",c:["Unterarm unter der Schulter","Hüfte heben, Körper gerade","Weiteratmen"],v:["Auf den Knien","Auf den Knien, ruhig halten","Auf den Füßen","Auf den Füßen, Hüfte langsam senken und heben"],sides:true},
+ {n:"Dead Bug",g:"r",c:["Rückenlage, Knie und Hüfte 90° angewinkelt","Unterer Rücken bleibt am Boden","Langsam, beim Strecken ausatmen"],v:["Hände neben dem Körper am Boden, Ferse abwechselnd Richtung Boden tippen","Arme senkrecht nach oben, Arm und Bein gegengleich strecken","Wie Stufe 2, 2 s in der Streckung halten","Gegengleich, 3 s knapp über dem Boden halten"]}
 ]};
+const TESTDEF=[
+ {key:"push",k:"treps",n:"Liegestütze maximal",anim:"pushup_3",d:60,unit:"Wiederholungen",c:["Normale Liegestütze am Boden, Hände schulterbreit","So viele saubere Wiederholungen wie möglich, ohne Pause","Stopp, sobald die Hüfte durchhängt oder die Brust nicht mehr tief kommt","Runter einatmen, hoch ausatmen, nie pressen","Danach die Anzahl eintragen. Geht noch keiner am Boden: 0"]},
+ {key:"wall",k:"thold",n:"Wandsitzen maximal",anim:"wallsit",d:120,cap:120,unit:"Sekunden",c:["Rücken an der Wand, Oberschenkel so waagrecht, wie es schmerzfrei geht","Jedes Mal gleich tief, damit die Werte vergleichbar sind","Start tippen, dann ruhig weiteratmen","Stopp tippen, wenn du die Position nicht mehr halten kannst. Ende spätestens nach 2 Minuten"]},
+ {key:"plank",k:"thold",n:"Unterarmstütz maximal",anim:"plank",d:120,cap:120,unit:"Sekunden",c:["Unterarme am Boden, Ellbogen unter den Schultern","Körper gerade von Kopf bis Ferse, Bauch fest","Start tippen, dann ruhig weiteratmen","Stopp tippen, sobald die Hüfte absinkt oder der Rücken zwickt. Ende spätestens nach 2 Minuten"]}];
 const WARM=[
  {n:"Marschieren auf der Stelle",d:60,c:["Arme mitschwingen","Locker und zügig"]},
  {n:"Armkreisen",d:30,c:["Vorwärts, dann rückwärts","Große, ruhige Kreise"]},
@@ -273,15 +301,18 @@ const AN={
  hipflex:D({feet:true,seg:2,hold:.4,kf:[{x:96,y:76,t:0,hd:0,fa:[120,130],fb:[64,130],ha:[106,76],hb:[104,77]},{x:101,y:80,t:-6,hd:0,fa:[120,130],fb:[64,130],ha:[111,80],hb:[109,81]}]}),
  calfst:D({props:["wallR"],feet:true,seg:2,hold:.4,kf:[{x:98,y:75,t:18,hd:0,fa:[118,130],fb:[66,130],ha:[141,42],hb:[139,44]},{x:102,y:77,t:24,hd:0,fa:[118,130],fb:[66,130],ha:[141,42],hb:[139,44]}]}),
  chest:D({props:["door"],eb:-1,seg:2,hold:.4,kf:[{x:101,y:72,t:0,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[103,76]},{x:107,y:73,t:8,hd:0,fa:[112,130],fb:[94,130],ha:[80,16],hb:[110,77]}]}),
+ pushup_3:D({eb:-1,segs:[1.8,1.4],kf:[{x:117.1,y:103.6,t:66,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]},{x:120.9,y:116.7,t:79,hd:0,fa:[62,128],fb:[59,128],ha:[150,129],hb:[147,129]}]}),
+ plank:D({segs:[2,2],hold:0,kf:[{x:98.6,y:116.8,t:79,hd:0,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]},{x:98.6,y:116,t:79,hd:-3,fa:[40,128],fb:[37,128],ha:[154,129],hb:[151,129]}]}),
  breathe:D({props:["chairL"],segs:[4,6],hold:0,kf:[{x:84,y:95,t:-3,hd:0,fa:[114,130],fb:[111,130],ha:[100,82],hb:[98,84]},{x:84,y:94,t:1,hd:-4,fa:[114,130],fb:[111,130],ha:[102,80],hb:[100,82]}]})
 };
-const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz erhöht":"pushup","Liegestütz eng":"pushup","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
+const AMAP={"Kniebeuge zum Stuhl":"squat","Liegestütz":"pushup","Liegestütz eng":"pushup","Beckenheben":"bridge","Bird-Dog":"birddog","Wandsitzen":"wallsit","Kurzer Ausfallschritt":"lunge","Bauchlage Y-T":"ytt","Wadenheben":"calf","Seitstütz":"side","Dead Bug":"deadbug","Marschieren auf der Stelle":"march","Armkreisen":"arms","Hüftkreisen":"hips","Katze-Kuh":"catcow","Probe-Kniebeugen":"minisquat","Schulterblätter":"blades","Langsam gehen":"walk","Lockeres Gehen":"walk","Hüftbeuger-Dehnung":"hipflex","Waden-Dehnung":"calfst","Brust-Dehnung":"chest","Ruhige Atmung":"breathe"};
 const PROPS={
  chairL:[[56,99,88,99],[58,99,58,130],[86,99,86,130],[58,99,56,62]],
  table:[[148,82,196,82],[152,82,152,130],[192,82,192,130]],
  wallL:[[62,-14,62,130]], wallP:[[152,-14,152,130]], towel:[[118,129,140,129]], wallR:[[142,-14,142,130]], door:[[80,-14,80,130],[80,-14,96,-14]],
  chairR:[[132,56,132,130],[132,98,162,98],[160,98,160,130]]};
-function animFor(n){const id=AMAP[n];return AN[id+"_"+PH]||AN[id]||null}
+AN.side_3=AN.side_2;
+function animFor(n,l){const id=AMAP[n];return (l!=null&&l>=0&&AN[id+"_"+l])||AN[id]||null}
 let pvI=0,pvAnim=null,pvClock=0,runAnim=null,runClock=0;
 function lerp(a,b,p){return Array.isArray(a)?a.map((v,i)=>v+(b[i]-v)*p):a+(b-a)*p}
 function poseAt(A,time){
@@ -362,45 +393,67 @@ function frame(now){
 requestAnimationFrame(frame);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let hist=store.get("kp_hist",[]);
-let T=store.get("kp_T",null), PH=store.get("kp_P",0);
-if(!T){T=hist.length&&hist[0].t==="A"?"B":"A"} else if(hist.length){T=hist[0].t==="A"?"B":"A"}
+let TESTS=store.get("kp_tests",[]);
+let LV=store.get("kp_lv",null);
+if(!LV||!LV.o){const p=Math.min(2,Math.max(0,+store.get("kp_P",0)||0))+1;LV={o:p,b:p,r:p}}
+const lastTrain=()=>hist.find(h=>h.t&&h.type!=="test");
+let T=lastTrain()?(lastTrain().t==="A"?"B":"A"):(store.get("kp_T","A")||"A");
 $("optVoice").checked=store.get("kp_voice",true);$("optBeep").checked=store.get("kp_beep",true);
-
+const AREA={o:{n:"Oberkörper",d:["Liegestütz an der Wand","Liegestütz am Tisch","Liegestütz an niedriger Fläche","Liegestütz am Boden"]},
+ b:{n:"Beine",d:["Auf den Stuhl setzen","Stuhl nur antippen","Langsam, 3 s runter","Ohne Stuhl, mit Haltepausen"]},
+ r:{n:"Rumpf",d:["Grundform","Gegengleich","Mit 2 s Haltezeit","Mit 3 s Haltezeit"]}};
+const lvPush=n=>n<5?1:n<12?2:n<20?3:4;
+const lvHold=s=>s<30?1:s<60?2:s<90?3:4;
+const li=e=>(LV[e.g]||1)-1;
+const timing=()=>P[Math.round((LV.o+LV.b+LV.r)/3)-1];
+const lastTest=()=>TESTS[0]||null;
+function exHold(e){const t=TESTS.find(x=>x.wall!=null&&x.wall>0),base=e.hold[li(e)];return t?Math.min(90,Math.max(base,5*Math.round(t.wall*.6/5))):base}
+function exV(e){const l=li(e),t=TESTS.find(x=>x.push!=null);let v=e.v[l];
+  if(e.tgt&&l===3&&t&&t.push>0)v+=` · Ziel ca. ${Math.max(3,Math.round(t.push*e.tgt))} Wdh.`;
+  if(e.hold)v+=` · ${exHold(e)} s halten`;return v}
 function weekKey(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()+3-((x.getDay()+6)%7));const w1=new Date(x.getFullYear(),0,4);return x.getFullYear()+"-"+(1+Math.round(((x-w1)/864e5-3+((w1.getDay()+6)%7))/7))}
 function fmt(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+const dstr=d=>new Date(d).toLocaleDateString("de-AT",{weekday:"short",day:"2-digit",month:"2-digit"});
+const sayDur=s=>s<60?`${s} Sekunden`:(s%60?`${Math.floor(s/60)} Minute ${s%60}`:(s===60?"1 Minute":`${s/60} Minuten`));
 
 function renderHome(){
   ["A","B"].forEach(k=>$("t"+k).setAttribute("aria-pressed",T===k));
-  [0,1,2].forEach(i=>$("p"+(i+1)).setAttribute("aria-pressed",PH===i));
   if(pvI>=EX[T].length)pvI=0;
-  $("exlist").innerHTML=EX[T].map((e,i)=>`<li class="b"><button type="button" class="exb" data-i="${i}" aria-pressed="${i===pvI}"><span class="n">${i+1}</span><span>${e.n}<span class="v">${e.v[PH]}${e.sides?" · je Seite halbe Zeit":""}</span></span></button></li>`).join("");
-  pvAnim=animFor(EX[T][pvI].n);$("pvcap").textContent=EX[T][pvI].n+" · "+EX[T][pvI].v[PH];
+  $("exlist").innerHTML=EX[T].map((e,i)=>`<li class="b"><button type="button" class="exb" data-i="${i}" aria-pressed="${i===pvI}"><span class="n">${i+1}</span><span>${e.n}<span class="v">${exV(e)}${e.sides?" · je Seite halbe Zeit":""}</span></span></button></li>`).join("");
+  const pe=EX[T][pvI];pvAnim=animFor(pe.n,li(pe));$("pvcap").textContent=pe.n+" · "+exV(pe);
+  $("lvrows").innerHTML=["o","b","r"].map(k=>`<div class="lvrow"><div><b>${AREA[k].n}</b><small>${AREA[k].d[LV[k]-1]}</small></div><div class="stp"><button type="button" data-k="${k}" data-d="-1" aria-label="${AREA[k].n} leichter"${LV[k]<=1?" disabled":""}>−</button><span>Stufe ${LV[k]}</span><button type="button" data-k="${k}" data-d="1" aria-label="${AREA[k].n} schwerer"${LV[k]>=4?" disabled":""}>+</button></div></div>`).join("");
+  const p=timing();$("timing").textContent=`${p.w} s Übung / ${p.r} s Pause`;
+  const t=lastTest(),days=t?Math.floor((Date.now()-t.d)/864e5):null;
+  $("tstat").innerHTML=!t?'<span class="pill warn">Noch kein Test. Starte am besten damit.</span>':(days>=28?`<span class="pill warn">Monatstest fällig · letzter vor ${days} Tagen</span>`:`<span class="pill ok">Nächster Test in ${28-days} Tag${28-days===1?"":"en"}</span>`);
+  $("tlist").hidden=!TESTS.length;
+  $("tlist").innerHTML=TESTS.slice(0,6).map(x=>`<li><span>${dstr(x.d)}</span><span>${x.push??"–"} Liegest. · Wand ${x.wall!=null?fmt(x.wall):"–"} · Stütz ${x.plank!=null?fmt(x.plank):"–"}</span></li>`).join("");
   const wk=weekKey(Date.now()),cnt=hist.filter(h=>weekKey(h.d)===wk&&!h.light).length;
-  $("dots").innerHTML="<i></i><i></i>".replace(/<i>/g,(m,o)=>m);
   [...$("dots").children].forEach((d,i)=>d.classList.toggle("on",i<cnt));
   $("weektxt").textContent=`Diese Woche: ${Math.min(cnt,2)} von 2 Einheiten`+(cnt>=2?" ✓":` · als Nächstes Training ${T}`);
-  if(hist.length){$("histcard").hidden=false;$("hist").innerHTML=hist.slice(0,8).map(h=>{const d=new Date(h.d);return `<li><span>${d.toLocaleDateString("de-AT",{weekday:"short",day:"2-digit",month:"2-digit"})} · ${h.light?"Nur Gehen":"Training "+h.t+" · "+P[h.p].label}</span><span>${h.min?h.min+" Min":""}</span></li>`}).join("")}
-  bpCheck();
+  if(hist.length){$("histcard").hidden=false;$("hist").innerHTML=hist.slice(0,8).map(h=>`<li><span>${dstr(h.d)} · ${h.type==="test"?"Monatstest":h.light?"Nur Gehen":"Training "+h.t}</span><span>${h.min?h.min+" Min":""}</span></li>`).join("")}
+  $("go").textContent=`Training ${T} starten · ${Math.round(total(buildTrain())/60)} Min`;
 }
-function bpCheck(){
-  mode="full";$("go").textContent=`Start · Training ${T} · ca. ${Math.round(total(build())/60)} Min`;
-}
-let mode="full";
-function build(){
+let mode="train",RES={},ts=null;
+function buildTrain(){
   const st=[{k:"ready",n:"Bereit machen",d:8,c:["Gleich geht’s los mit dem Aufwärmen"]}];
   WARM.forEach(w=>st.push({k:"warm",...w}));
-  if(mode==="light"){st.push({k:"walk",n:"Lockeres Gehen",d:600,c:["Ruhiges Tempo, du kannst dabei sprechen","Kein Krafttraining heute"]})}
-  else{
-    const p=P[PH],ex=EX[T];
-    for(let r=1;r<=2;r++)ex.forEach((e,i)=>{
-      st.push({k:"work",n:e.n,v:e.v[PH],c:e.c,d:e.hold?e.hold[PH]:p.w,sides:e.sides,lab:`Übung ${i+1}/${ex.length} · Runde ${r}/2`});
-      if(!(r===2&&i===ex.length-1))st.push({k:"rest",n:"Pause",d:p.r,c:["Locker bewegen, durchatmen"],lab:`Pause · Runde ${r}/2`});
-    });
-  }
+  const p=timing(),ex=EX[T];
+  for(let r=1;r<=2;r++)ex.forEach((e,i)=>{
+    st.push({k:"work",n:e.n,v:exV(e),c:e.c,d:e.hold?exHold(e):p.w,sides:e.sides,li:li(e),lab:`Übung ${i+1}/${ex.length} · Runde ${r}/2`});
+    if(!(r===2&&i===ex.length-1))st.push({k:"rest",n:"Pause",d:p.r,c:["Locker bewegen, durchatmen"],lab:`Pause · Runde ${r}/2`});
+  });
+  COOL.forEach(c=>st.push({k:"cool",...c}));
+  return st;
+}
+function buildTest(){
+  const st=[{k:"ready",n:"Bereit machen",d:8,c:["Monatstest: 3 Messungen mit je 2 Minuten Pause","Gleich geht’s los mit dem Aufwärmen"]}];
+  WARM.forEach(w=>st.push({k:"warm",...w}));
+  TESTDEF.forEach((t,i)=>{st.push({...t,lab:`Test ${i+1}/${TESTDEF.length}`});if(i<TESTDEF.length-1)st.push({k:"rest",n:"Pause",d:120,c:["Locker gehen, durchatmen"],lab:"Pause · 2 Min"})});
   COOL.forEach(c=>st.push({k:"cool",...c}));
   return st;
 }
 function total(st){return st.reduce((a,s)=>a+s.d,0)}
+const isTest=s=>s&&(s.k==="treps"||s.k==="thold");
 
 /* audio + voice */
 let ac=null;
@@ -415,42 +468,79 @@ let S=[],idx=0,rem=0,endAt=0,running=false,timer=null,lastSec=null,halfDone=fals
 const KL={ready:"Start",warm:"Aufwärmen",work:"Übung",rest:"Pause",cool:"Cool-down",walk:"Gehen"};
 function load(i,announce){
   idx=i;const s=S[idx];rem=s.d*1000;endAt=Date.now()+rem;lastSec=null;halfDone=false;
-  const r=$("run");r.className="k-"+s.k;
-  $("tag").textContent=s.lab||KL[s.k]+(s.k==="warm"?` ${WARM.indexOf(WARM.find(w=>w.n===s.n))+1}/${WARM.length}`:s.k==="cool"?` ${COOL.findIndex(c=>c.n===s.n)+1}/${COOL.length}`:"");
+  const r=$("run");r.className="k-"+(isTest(s)?"work":s.k);
+  $("tag").textContent=s.lab||KL[s.k]+(s.k==="warm"?` ${WARM.findIndex(w=>w.n===s.n)+1}/${WARM.length}`:s.k==="cool"?` ${COOL.findIndex(c=>c.n===s.n)+1}/${COOL.length}`:"");
   const nx=S.slice(idx+1).find(x=>x.k!=="rest");
-  if(s.k==="rest"){$("exname").textContent="Pause";$("exvar").textContent="";$("cues").innerHTML=`<li>Als Nächstes: <b>${nx.n}</b></li><li>${nx.v||""}</li>`;$("nxt").innerHTML="Locker bewegen, durchatmen."}
+  if(s.k==="rest"){$("exname").textContent="Pause";$("exvar").textContent="";$("cues").innerHTML=`<li>Als Nächstes: <b>${nx.n}</b></li>`+(nx.v?`<li>${nx.v}</li>`:"");$("nxt").innerHTML="Locker bewegen, durchatmen."}
   else{$("exname").textContent=s.n;$("exvar").textContent=s.v?(s.v+(s.sides?" · Seitenwechsel bei Halbzeit":"")):(s.sides?"Seitenwechsel bei Halbzeit":"");$("cues").innerHTML=s.c.map(c=>`<li>${c}</li>`).join("");$("nxt").innerHTML=nx?`Danach: <b>${nx.n}</b>`:"Danach: fertig"}
   $("side").textContent=s.sides?"Seite 1":"";
-  runAnim=animFor((s.k==="rest"||s.k==="ready")&&nx?nx.n:s.n);runClock=0;
+  $("ring").hidden=false;$("tin").hidden=true;ts=null;
+  if(isTest(s)){
+    const prev=TESTS.find(x=>x[s.key]!=null);
+    ts={phase:s.k==="treps"?"done":"idle",t0:0,val:s.k==="treps"?(prev?prev[s.key]:0):0,ann:0};
+    if(s.k==="treps")showStep();
+  }
+  const tgt=(s.k==="rest"||s.k==="ready")&&nx?nx:s;
+  runAnim=tgt.anim?AN[tgt.anim]:animFor(tgt.n,tgt.li);runClock=0;
   if(announce){
-    if(s.k==="rest")say(`Pause. Als Nächstes ${nx.n}`);else if(s.k!=="ready")say(s.n);else say("Bereit machen");
+    if(s.k==="rest")say(`Pause. Als Nächstes ${nx.n}`);else if(s.k==="thold")say(`${s.n}. Start tippen, wenn du in Position bist`);else if(s.k!=="ready")say(s.n);else say("Bereit machen");
     beep(s.k==="rest"?520:880,s.k==="rest"?300:450,.3);vib(s.k==="rest"?120:[80,60,80]);
   }
   paint();
 }
+function showStep(){const s=S[idx];$("ring").hidden=true;$("tin").hidden=false;$("tv").textContent=Math.round(ts.val);$("tu").textContent=s.unit==="Sekunden"?`Sekunden (${fmt(ts.val)})`:s.unit}
 function paint(){
-  const s=S[idx],sec=Math.ceil(rem/1000);
+  const s=S[idx];
+  const done=total(S.slice(0,idx))+(isTest(s)?0:(s.d-rem/1000));
+  $("prog").style.width=(100*done/tot).toFixed(1)+"%";
+  $("elapsed").textContent=fmt((Date.now()-startTs)/1000);$("left").textContent="noch ca. "+fmt(tot-done);
+  if(isTest(s)){
+    if(s.k==="thold"&&ts.phase!=="done"){$("secs").textContent=fmt(ts.val);$("arc").style.strokeDashoffset=(282.74*(1-Math.min(1,ts.val/s.cap))).toFixed(1)}
+    $("pp").textContent=ts.phase==="idle"?"Start":ts.phase==="run"?"Stopp":"Speichern";
+    $("skip").textContent="Auslassen ›";return;
+  }
+  $("skip").textContent="Weiter ›";
+  const sec=Math.ceil(rem/1000);
   $("secs").textContent=sec>=60?fmt(sec):sec;
   $("arc").style.strokeDashoffset=(282.74*(1-rem/(s.d*1000))).toFixed(1);
-  const done=total(S.slice(0,idx))+(s.d-rem/1000);
-  $("prog").style.width=(100*done/tot).toFixed(1)+"%";
-  $("elapsed").textContent=fmt(done);$("left").textContent="noch "+fmt(tot-done);
   $("pp").textContent=running?"Pause":"Weiter";
 }
+function holdStop(auto){
+  ts.phase="done";ts.val=Math.min(S[idx].cap,Math.round(ts.val));
+  beep(880,200);setTimeout(()=>beep(1100,350),230);vib([150,80,150]);
+  say(auto?"Zwei Minuten. Stopp, sehr gut!":`Stopp. ${sayDur(ts.val)}`);
+  showStep();paint();
+}
+function testAction(){
+  const s=S[idx];
+  if(s.k==="thold"&&ts.phase==="idle"){ts.phase="run";ts.t0=Date.now();ts.val=0;ts.ann=0;say("Los");beep(880,350,.3);vib(120);paint();return}
+  if(s.k==="thold"&&ts.phase==="run"){holdStop(false);return}
+  RES[s.key]=Math.round(ts.val);next();
+}
+function next(){if(idx+1<S.length)load(idx+1,true);else finish()}
 function tick(){
   if(!running)return;
-  rem=endAt-Date.now();const s=S[idx],sec=Math.ceil(rem/1000);
+  const s=S[idx];
+  if(isTest(s)){
+    if(s.k==="thold"&&ts.phase==="run"){
+      ts.val=(Date.now()-ts.t0)/1000;const a=Math.floor(ts.val/30);
+      if(a>ts.ann){ts.ann=a;if(ts.val<s.cap-1){say(sayDur(a*30));beep(700,120)}}
+      if(ts.val>=s.cap){holdStop(true);return}
+    }
+    paint();return;
+  }
+  rem=endAt-Date.now();const sec=Math.ceil(rem/1000);
   if(s.sides&&!halfDone&&rem<=s.d*500){halfDone=true;$("side").textContent="Seite 2";say("Seite wechseln");beep(700,150);setTimeout(()=>beep(700,150),220);vib([100,80,100])}
   if(sec!==lastSec&&sec<=3&&sec>=1){beep(660,120,.2)}
   lastSec=sec;
-  if(rem<=0){if(idx+1<S.length)load(idx+1,true);else return finish()}
+  if(rem<=0){next();return}
   paint();
 }
-function start(){
+function start(type){
   try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume&&ac.resume()}catch(e){}
   try{window.speechSynthesis&&window.speechSynthesis.getVoices()}catch(e){}
-  store.set("kp_T",T);store.set("kp_P",PH);store.set("kp_voice",$("optVoice").checked);store.set("kp_beep",$("optBeep").checked);
-  S=build();tot=total(S);running=true;startTs=Date.now();
+  store.set("kp_T",T);store.set("kp_voice",$("optVoice").checked);store.set("kp_beep",$("optBeep").checked);
+  mode=type;RES={};S=type==="test"?buildTest():buildTrain();tot=total(S);running=true;startTs=Date.now();
   $("home").hidden=true;$("fin").hidden=true;$("run").hidden=false;
   lock();load(0,true);clearInterval(timer);timer=setInterval(tick,200);
 }
@@ -458,22 +548,43 @@ function toggle(){if(running){running=false;rem=endAt-Date.now();say("Pause")}el
 function finish(){
   running=false;clearInterval(timer);try{wl&&wl.release()}catch(e){}
   beep(880,200);setTimeout(()=>beep(1100,400),250);vib([200,100,200]);say("Geschafft. Gut gemacht!");
-  hist.unshift({d:Date.now(),t:T,p:PH,light:mode==="light",min:Math.round((Date.now()-startTs)/60000)});hist=hist.slice(0,40);store.set("kp_hist",hist);
-  $("finTxt").textContent=mode==="light"?"Aufwärmen, Gehen und Cool-down erledigt.":`Training ${T} · ${P[PH].label} · ${fmt(tot)} Min`;
+  const min=Math.round((Date.now()-startTs)/60000);
+  $("finDet").hidden=true;$("finDet").innerHTML="";
+  if(mode==="test"){
+    const prev=lastTest(),e={d:Date.now(),push:RES.push??null,wall:RES.wall??null,plank:RES.plank??null};
+    const old={...LV},rows=[];
+    const diff=(k,f)=>prev&&prev[k]!=null&&e[k]!=null?` <small>(${e[k]-prev[k]>=0?"+":"−"}${f(Math.abs(e[k]-prev[k]))})</small>`:"";
+    if(e.push!=null||e.wall!=null||e.plank!=null){TESTS.unshift(e);TESTS=TESTS.slice(0,24);store.set("kp_tests",TESTS)}
+    if(e.push!=null){LV.o=lvPush(e.push);rows.push(`<li><span>Liegestütze: <b>${e.push}</b>${diff("push",x=>x)}</span><span>Oberkörper ${old.o} → ${LV.o}</span></li>`)}
+    if(e.wall!=null){LV.b=lvHold(e.wall);rows.push(`<li><span>Wandsitzen: <b>${fmt(e.wall)}</b>${diff("wall",fmt)}</span><span>Beine ${old.b} → ${LV.b}</span></li>`)}
+    if(e.plank!=null){LV.r=lvHold(e.plank);rows.push(`<li><span>Unterarmstütz: <b>${fmt(e.plank)}</b>${diff("plank",fmt)}</span><span>Rumpf ${old.r} → ${LV.r}</span></li>`)}
+    store.set("kp_lv",LV);
+    hist.unshift({d:Date.now(),type:"test",min});
+    $("finTxt").textContent=rows.length?"Monatstest erledigt. Deine Stufen sind angepasst:":"Monatstest beendet, ohne Ergebnisse.";
+    if(rows.length){$("finDet").innerHTML=rows.join("");$("finDet").hidden=false}
+    $("finNote").textContent="Ergebnisse und Stufen sind auf diesem Gerät gespeichert.";
+  }else{
+    hist.unshift({d:Date.now(),t:T,lv:{...LV},min});
+    $("finTxt").textContent=`Training ${T} · ${fmt(tot)} Min`;
+    $("finNote").textContent="Die Einheit ist in „Letzte Einheiten“ gespeichert (nur auf diesem Gerät).";
+  }
+  hist=hist.slice(0,60);store.set("kp_hist",hist);
   $("run").hidden=true;$("fin").hidden=false;
 }
 function goHome(){
-  T=hist.length&&hist[0].t==="A"?"B":"A";
+  const lt=lastTrain();T=lt?(lt.t==="A"?"B":"A"):T;
   $("fin").hidden=true;$("run").hidden=true;$("home").hidden=false;renderHome();window.scrollTo(0,0);
 }
 
 $("segT").addEventListener("click",e=>{const b=e.target.closest("button");if(b){T=b.dataset.v;renderHome()}});
 $("exlist").addEventListener("click",e=>{const b=e.target.closest(".exb");if(b){pvI=+b.dataset.i;pvClock=0;renderHome()}});
-$("segP").addEventListener("click",e=>{const b=e.target.closest("button");if(b){PH=+b.dataset.v;renderHome()}});
-$("go").addEventListener("click",start);
-$("pp").addEventListener("click",toggle);
-$("skip").addEventListener("click",()=>{if(idx+1<S.length){load(idx+1,true);if(running)endAt=Date.now()+rem}else finish()});
-$("back").addEventListener("click",()=>{const el=S[idx].d*1000-rem;load(el>3000||idx===0?idx:idx-1,true);if(!running)paint()});
+$("lvrows").addEventListener("click",e=>{const b=e.target.closest("button[data-k]");if(!b||b.disabled)return;const k=b.dataset.k;LV[k]=Math.min(4,Math.max(1,LV[k]+ +b.dataset.d));store.set("kp_lv",LV);renderHome()});
+$("go").addEventListener("click",()=>start("train"));
+$("gotest").addEventListener("click",()=>start("test"));
+$("pp").addEventListener("click",()=>{if(isTest(S[idx]))testAction();else toggle()});
+$("tstep").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!ts)return;ts.val=Math.max(0,Math.round(ts.val)+ +b.dataset.d);showStep()});
+$("skip").addEventListener("click",()=>{next()});
+$("back").addEventListener("click",()=>{const s=S[idx];const el=isTest(s)?9e9:s.d*1000-rem;load(el>3000||idx===0?idx:idx-1,true);if(!running)paint()});
 $("quit").addEventListener("click",()=>{const q=$("quit");if(quitArm){running=false;clearInterval(timer);try{wl&&wl.release()}catch(e){};try{speechSynthesis.cancel()}catch(e){};quitArm=false;q.classList.remove("arm");q.textContent="Beenden";$("run").hidden=true;$("home").hidden=false;renderHome();return}quitArm=true;q.classList.add("arm");q.textContent="Wirklich beenden?";setTimeout(()=>{quitArm=false;q.classList.remove("arm");q.textContent="Beenden"},3000)});
 $("home2").addEventListener("click",goHome);
 
