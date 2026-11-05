@@ -242,7 +242,9 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
   <section class="card">
     <h2>Daten sichern</h2>
     <p class="note">Alle Einheiten, Wiederholungen und Tests als Tabelle (CSV), z. B. für den Arzttermin. Die Daten liegen sonst nur auf diesem Gerät.</p>
-    <div class="btnrow"><button class="sec" id="expCopy" type="button">Kopieren</button><button class="sec" id="expSave" type="button">Als Datei speichern</button></div>
+    <div class="btnrow"><button class="sec" id="expShare" type="button">Datei teilen</button><button class="sec" id="expSave" type="button">Als Datei speichern</button><button class="sec" id="expCopy" type="button">Kopieren</button></div>
+    <p class="note">„Datei teilen“ öffnet das Teilen-Menü des Handys: dort z. B. die Claude-App, Google Drive oder E-Mail wählen.</p>
+    <p class="note" style="opacity:.7">App-Version 2026-11-05b</p>
     <p class="note" id="expMsg" aria-live="polite"></p>
     <textarea id="expTxt" rows="4" readonly hidden style="width:100%;font:12px/1.3 ui-monospace,monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px"></textarea>
   </section>
@@ -777,7 +779,18 @@ $("mSave").addEventListener("click",()=>{
 $("expCopy").addEventListener("click",()=>{const t=csv();const ok=()=>{$("expMsg").textContent="In die Zwischenablage kopiert. Du kannst es z. B. in eine E-Mail oder Tabelle einfügen."};
   const fb=()=>{$("expTxt").hidden=false;$("expTxt").value=t;$("expTxt").select();$("expMsg").textContent="Kopieren ging nicht automatisch. Der Text ist markiert, bitte selbst kopieren."};
   try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}});
-$("expSave").addEventListener("click",()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv()],{type:"text/csv;charset=utf-8"}));const _n=new Date();a.download="krafttraining-"+_n.getFullYear()+"-"+String(_n.getMonth()+1).padStart(2,"0")+"-"+String(_n.getDate()).padStart(2,"0")+".csv";document.body.appendChild(a);a.click();a.remove();$("expMsg").textContent="Datei wird gespeichert. In der Claude-Ansicht geht das nicht, in der installierten App schon. Sonst „Kopieren“ verwenden."}catch(e){$("expMsg").textContent="Speichern ging nicht. Bitte „Kopieren“ verwenden."}});
+const expName=()=>{const n=new Date();return "krafttraining-"+n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0")+".csv"};
+const expBlob=()=>new Blob(["﻿"+csv()],{type:"text/csv"});
+function expDownload(){try{const u=URL.createObjectURL(expBlob()),a=document.createElement("a");a.href=u;a.download=expName();a.rel="noopener";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(u)},4000);
+  $("expMsg").textContent="Gespeichert als "+expName()+" im Ordner Download. Erscheint nichts, bitte „Datei teilen“ verwenden."}catch(e){$("expMsg").textContent="Speichern ging nicht. Bitte „Datei teilen“ oder „Kopieren“ verwenden."}}
+$("expSave").addEventListener("click",expDownload);
+$("expShare").addEventListener("click",async()=>{
+  let f=null;try{f=new File([expBlob()],expName(),{type:"text/csv"})}catch(e){}
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){
+    try{await navigator.share({files:[f],title:expName()});$("expMsg").textContent="Geteilt: "+expName()}
+    catch(e){if(e&&e.name==="AbortError"){$("expMsg").textContent="Teilen abgebrochen."}else{$("expMsg").textContent="Teilen ging nicht ("+(e&&e.name||"Fehler")+"). Ich versuche, die Datei zu speichern.";expDownload()}}
+  }else{$("expMsg").textContent="Dieses Gerät kann hier keine Dateien teilen. Ich versuche, die Datei zu speichern.";expDownload()}
+});
 
 renderHome();
 })();
