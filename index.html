@@ -173,7 +173,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
 
   <section class="card">
     <h2>Blutdruck-Block</h2>
-    <p class="note">Wandsitzen in 4 Sätzen mit je 2 Minuten Pause. Isometrisches Training senkte den Blutdruck in Studien am stärksten. Ziel: 3× pro Woche, auch an Tagen ohne Krafttraining. Vorher mit dem Hausarzt abstimmen.</p>
+    <p class="note">Wandsitzen in 4 Sätzen mit je 2 Minuten Pause, ohne Aufwärmen. Isometrisches Training senkte den Blutdruck in Studien am stärksten. Ziel: 3× pro Woche, auch an Tagen ohne Krafttraining. Vorher mit dem Hausarzt abstimmen.</p>
     <div><span class="note">Haltezeit pro Satz:</span></div>
     <div class="chips" id="isoD"><button type="button" data-v="60">1:00</button><button type="button" data-v="90">1:30</button><button type="button" data-v="120">2:00</button></div>
     <p class="note">Mit 1:00 beginnen, nach ein bis zwei Wochen steigern. Kniewinkel so wählen, dass die letzten 20 Sekunden anstrengend, aber gut machbar sind (etwa 7 von 10). Durchatmen, nie pressen.</p>
@@ -523,8 +523,7 @@ function csv(){
   return lines.join("\n");
 }
 function buildIso(){
-  const st=[{k:"ready",n:"Bereit machen",d:8,c:["Blutdruck-Block: kurzes Aufwärmen, dann 4 Sätze Wandsitzen"]}];
-  [WARM[0],WARM[2],WARM[4]].forEach(w=>st.push({k:"warm",...w}));
+  const st=[{k:"ready",n:"Bereit machen",d:10,c:["Blutdruck-Block: 4 Sätze Wandsitzen","Stell dich mit dem Rücken an die Wand"]}];
   for(let i=1;i<=4;i++){st.push({k:"work",n:"Wandsitzen",iso:true,hold:true,v:`${fmt(ISO)} halten · etwa 7 von 10 am Ende`,c:["Rücken an der Wand, jedes Mal gleiche Tiefe","Ruhig und gleichmäßig weiteratmen, nie pressen","Wird es zu schwer: etwas höher rutschen statt abbrechen"],d:ISO,li:0,lab:`Satz ${i}/4`});
     if(i<4)st.push({k:"rest",n:"Pause",d:120,c:["Locker gehen, Beine ausschütteln"],lab:"Pause · 2 Min"})}
   [COOL[0],COOL[4]].forEach(c=>st.push({k:"cool",...c}));
