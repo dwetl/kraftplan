@@ -244,7 +244,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--work);outline-o
     <p class="note">Alle Einheiten, Wiederholungen und Tests als Tabelle (CSV), z. B. für den Arzttermin. Die Daten liegen sonst nur auf diesem Gerät.</p>
     <div class="btnrow"><button class="sec" id="expShare" type="button">Datei teilen</button><button class="sec" id="expSave" type="button">Als Datei speichern</button><button class="sec" id="expCopy" type="button">Kopieren</button></div>
     <p class="note">„Datei teilen“ öffnet das Teilen-Menü des Handys: dort z. B. die Claude-App, Google Drive oder E-Mail wählen.</p>
-    <p class="note" style="opacity:.7">App-Version 2026-11-05b</p>
+    <p class="note" style="opacity:.7">App-Version 2026-11-05c</p>
     <p class="note" id="expMsg" aria-live="polite"></p>
     <textarea id="expTxt" rows="4" readonly hidden style="width:100%;font:12px/1.3 ui-monospace,monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px"></textarea>
   </section>
@@ -781,15 +781,16 @@ $("expCopy").addEventListener("click",()=>{const t=csv();const ok=()=>{$("expMsg
   try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}});
 const expName=()=>{const n=new Date();return "krafttraining-"+n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0")+".csv"};
 const expBlob=()=>new Blob(["﻿"+csv()],{type:"text/csv"});
-function expDownload(){try{const u=URL.createObjectURL(expBlob()),a=document.createElement("a");a.href=u;a.download=expName();a.rel="noopener";document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(u)},4000);
-  $("expMsg").textContent="Gespeichert als "+expName()+" im Ordner Download. Erscheint nichts, bitte „Datei teilen“ verwenden."}catch(e){$("expMsg").textContent="Speichern ging nicht. Bitte „Datei teilen“ oder „Kopieren“ verwenden."}}
-$("expSave").addEventListener("click",expDownload);
+function expDownload(note){try{const b64=btoa(unescape(encodeURIComponent("﻿"+csv()))),a=document.createElement("a");a.href="data:text/csv;charset=utf-8;base64,"+b64;a.download=expName();document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),2000);
+  $("expMsg").textContent=(note?note+" ":"")+"Download gestartet: "+expName()+"."}catch(e){$("expMsg").textContent=(note?note+" ":"")+"Speichern ging nicht ("+(e&&e.name||"Fehler")+"). Bitte „Kopieren“ verwenden."}}
+$("expSave").addEventListener("click",()=>expDownload());
 $("expShare").addEventListener("click",async()=>{
-  let f=null;try{f=new File([expBlob()],expName(),{type:"text/csv"})}catch(e){}
-  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){
-    try{await navigator.share({files:[f],title:expName()});$("expMsg").textContent="Geteilt: "+expName()}
-    catch(e){if(e&&e.name==="AbortError"){$("expMsg").textContent="Teilen abgebrochen."}else{$("expMsg").textContent="Teilen ging nicht ("+(e&&e.name||"Fehler")+"). Ich versuche, die Datei zu speichern.";expDownload()}}
-  }else{$("expMsg").textContent="Dieses Gerät kann hier keine Dateien teilen. Ich versuche, die Datei zu speichern.";expDownload()}
+  if(!navigator.share){expDownload("Teilen wird hier nicht unterstützt.");return}
+  const txt="﻿"+csv(),n=expName(),tries=[[n,"text/csv"],[n,"text/plain"],[n.replace(/\.csv$/,".txt"),"text/plain"]];
+  let f=null;for(const[nm,ty] of tries){try{const c=new File([txt],nm,{type:ty});if(!navigator.canShare||navigator.canShare({files:[c]})){f=c;break}}catch(e){}}
+  if(!f){expDownload("Dateien teilen wird hier nicht unterstützt.");return}
+  try{await navigator.share({files:[f]});$("expMsg").textContent="Geteilt: "+f.name}
+  catch(e){if(e&&e.name==="AbortError")$("expMsg").textContent="Teilen abgebrochen.";else expDownload("Teilen ging nicht ("+(e&&e.name||"Fehler")+").")}
 });
 
 renderHome();
